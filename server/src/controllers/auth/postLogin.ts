@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
 
+// Login handler
 export const postLogin = async (req: Request, res: Response): Promise<Response> => {
-    return res.send(" this is login");
+    const { email, password } = req.body;
+    // Handle login logic here
+    return res.send("Login successful");
 };
