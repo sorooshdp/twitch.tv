@@ -1,0 +1,20 @@
+.gradient-container {
+    background: linear-gradient(to bottom right, #18181b, #4a0e4e);
+    position: relative;
+  }
+  
+  .gradient-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+      circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      rgba(255, 255, 255, 0.07) 0%,
+      rgba(0, 0, 0, 0) 80%
+    );
+    pointer-events: none;
+    transition: background 0.15s ease;
+  }
