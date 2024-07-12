@@ -1,4 +1,5 @@
 export type FormInfo = {
+    username: string;
     email: string;
     password: string;
 };

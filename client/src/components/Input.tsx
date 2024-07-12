@@ -18,7 +18,7 @@ const Input: React.FC<InputProps> = ({ label, error, className, ...props }) => {
   return (
     <div className="w-full relative">
       <input
-        className={`peer border py-2 px-4 rounded w-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${
+        className={`peer border py-2 text-black px-4 rounded w-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${
           error ? 'border-red-500' : 'border-muted'
         } ${className} placeholder-transparent`}
         placeholder={label}
@@ -30,11 +30,11 @@ const Input: React.FC<InputProps> = ({ label, error, className, ...props }) => {
         <label 
           className={`absolute left-4 -top-2.5 bg-white px-1 text-sm transition-all duration-200 
           ${isFocused || hasValue 
-            ? 'text-primary  text-xs' 
+            ? 'text-primary text-xs bg-secondary rounded' 
             : 'text-gray-500 top-2.5 text-base'
           }
           peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-base
-          peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-primary peer-focus:bg-secondary peer-focus:rounded`}
+          peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-primary `}
         >
           {label}
         </label>

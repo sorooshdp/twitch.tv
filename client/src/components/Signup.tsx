@@ -1,10 +1,13 @@
-import React, {useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Input from "./Input";
 import { FormInfo, isEmail, isPassword } from "../ts/utils/Validation";
+import { useSignup } from "../ts/hooks/useSingup";
 
 const SignupPage: React.FC = () => {
+    const { signup, isLoading } = useSignup();
     const [formData, setFormData] = useState<FormInfo>({
+        username: "",
         email: "",
         password: "",
     });
@@ -14,6 +17,8 @@ const SignupPage: React.FC = () => {
 
     const validateField = (name: string, value: string): string | undefined => {
         switch (name) {
+            case "username":
+                return value.length >= 3 ? undefined : "Username must be at least 3 characters long";
             case "email":
                 return isEmail(value) ? undefined : "Invalid email address";
             case "password":
@@ -41,7 +46,8 @@ const SignupPage: React.FC = () => {
         const error = validateField(name, value);
         setErrors((prev) => ({ ...prev, [name]: error }));
         const isValid =
-            error == undefined &&
+            Object.values(errors).every(error => error === undefined) &&
+            formData.username !== "" &&
             formData.email !== "" &&
             formData.password !== "" &&
             confirmPassword !== "";
@@ -52,7 +58,7 @@ const SignupPage: React.FC = () => {
         e.preventDefault();
         if (isFormValid) {
             console.log("Form is valid. Submitting...", formData);
-            // Here you would typically send the data to your backend
+            signup(formData.email, formData.password, formData.username);
         } else {
             console.log("Form is invalid");
         }
@@ -63,6 +69,17 @@ const SignupPage: React.FC = () => {
             <div className="bg-opacity-20 bg-secondary backdrop-filter backdrop-blur-sm rounded-lg p-8 shadow-lg">
                 <h1 className="text-4xl font-bold text-primary mb-8 text-center">Sign Up</h1>
                 <form className="space-y-4 w-80" onSubmit={handleSubmit}>
+                    <Input
+                        type="text"
+                        name="username"
+                        value={formData.username}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        placeholder="Username"
+                        label="Username"
+                        required
+                        error={errors.username}
+                    />
                     <Input
                         type="email"
                         name="email"
@@ -98,12 +115,22 @@ const SignupPage: React.FC = () => {
                     />
                     <button
                         type="submit"
-                        className={`bg-primary text-secondary py-2 px-4 rounded w-full transition duration-300 ${
-                            isFormValid ? "hover:bg-opacity-90" : "opacity-50 cursor-not-allowed"
+                        className={`bg-primary text-secondary py-2 px-4 rounded w-full transition duration-300 flex items-center justify-center ${
+                            isFormValid && !isLoading ? "hover:bg-opacity-90" : "opacity-50 cursor-not-allowed"
                         }`}
-                        disabled={!isFormValid}
+                        disabled={!isFormValid || isLoading}
                     >
-                        Sign Up
+                        {isLoading ? (
+                            <>
+                                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Signing up...
+                            </>
+                        ) : (
+                            'Sign Up'
+                        )}
                     </button>
                 </form>
                 <p className="mt-4 text-muted text-center">
