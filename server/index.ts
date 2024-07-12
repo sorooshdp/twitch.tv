@@ -3,20 +3,29 @@ import cors from "cors";
 import http from "http";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-
 import authRoutes from "./src/routes/authRoutes.js";
 
 dotenv.config();
 
 const PORT = process.env.PORT || 5514;
-
 const app = express();
+
 app.use(express.json());
-app.use(cors());
+
+// Updated CORS configuration
+app.use(cors({
+  origin: 'https://localhost:5173', // or your frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 
 app.get("/", (req, res) => {
     return res.send("Hello!");
 });
+
+// Handle OPTIONS requests
+app.options('*', cors());
 
 app.use("/api/auth", authRoutes);
 
@@ -30,6 +39,6 @@ mongoose
         });
     })
     .catch((err) => {
-        console.log("database connetion feild. server didn't start.");
+        console.log("database connection failed. server didn't start.");
         console.log(err);
     });
