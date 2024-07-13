@@ -1,9 +1,11 @@
 import express from "express";
 import cors from "cors";
-import http from "http";
+import https from "https"
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import authRoutes from "./src/routes/authRoutes.js";
+import channelsRoutes from "./src/routes/channelsRoutes.js";
+import fs from "fs";
 
 dotenv.config();
 
@@ -12,9 +14,8 @@ const app = express();
 
 app.use(express.json());
 
-// Updated CORS configuration
 app.use(cors({
-  origin: 'https://localhost:5173', // or your frontend URL
+  origin: 'https://localhost:5173',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
@@ -24,12 +25,17 @@ app.get("/", (req, res) => {
     return res.send("Hello!");
 });
 
-// Handle OPTIONS requests
 app.options('*', cors());
 
 app.use("/api/auth", authRoutes);
+app.use("/api/channels", channelsRoutes);
 
-const server = http.createServer(app);
+const httpsOptions = {
+    key: fs.readFileSync('./cert.key'),
+    cert: fs.readFileSync('./cert.crt')
+};
+
+const server =  https.createServer(httpsOptions, app);
 
 mongoose
     .connect(process.env.MONGO_URL!)
