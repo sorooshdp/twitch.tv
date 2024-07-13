@@ -7,9 +7,15 @@ type CustomError = {
   e: unknown;
 };
 
+const api = axios.create({ 
+  baseURL: "https://localhost:5514/api", 
+  timeout: 5000,
+  withCredentials: true
+});
+
 const loginReq = async (data: { [key: string]: string }): Promise<AxiosResponse | CustomError> => {
   try {
-    return await axios.create({ baseURL: "http://localhost:5514/api", timeout: 1000 }).post("auth/login", data);
+    return await api.post("auth/login", data);
   } catch (e) {
     return {
       error: true,
@@ -31,8 +37,8 @@ export const useLogin = () => {
       return console.log(res.e);
     }
     
-    const { userData } = res.data;
-    localStorage.setItem("user", JSON.stringify(userData));
+    const { userDetails } = res.data;
+    localStorage.setItem("user", JSON.stringify(userDetails));
     navigate("/");
   };
 

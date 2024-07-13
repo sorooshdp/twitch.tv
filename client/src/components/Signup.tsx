@@ -58,7 +58,7 @@ const SignupPage: React.FC = () => {
         e.preventDefault();
         if (isFormValid) {
             console.log("Form is valid. Submitting...", formData);
-            signup(formData.email, formData.password, formData.username);
+            signup(formData.username, formData.email, formData.password);
         } else {
             console.log("Form is invalid");
         }

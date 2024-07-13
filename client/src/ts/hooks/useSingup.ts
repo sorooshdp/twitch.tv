@@ -42,8 +42,10 @@ export const useSignup = () => {
         return;
       }
       
-      const { userData } = res.data;
-      localStorage.setItem("user", JSON.stringify(userData));
+      const { userDetails } = res.data;
+      console.log(res);
+      console.log(userDetails)
+      localStorage.setItem("user", JSON.stringify(userDetails));
       navigate("/");
     } catch (e) {
       setIsLoading(false);
