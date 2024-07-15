@@ -1,4 +1,10 @@
 import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+const config = process.env;
+
+interface AuthRequest extends Request {
+    user?: jwt.JwtPayload | string;
+}
 
 interface RegisterRequestBody {
     username: string;
@@ -58,9 +64,31 @@ export const validateLogin = (req: Request<{}, {}, LoginRequestBody>, res: Respo
 export const validateChannelId = (req: Request<{}, {}>, res: Response, next: NextFunction): void => {
     const { channelId } = req.body;
 
-    if ( typeof channelId != "string") {
+    if (typeof channelId != "string") {
         res.status(400).json({ error: "channel id is not valid!" });
         return;
+    }
+
+    next();
+};
+
+export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction) => {
+    let token = req.body.token || req.query.token || req.header("Authorization");
+
+    if (!token) {
+        console.log("token not found!");
+        res.status(401).send("you should provide the token for auth");
+    }
+
+    try {
+        token = token.replace(/^Bearer\s+/, "");
+        const decoded = jwt.verify(token, config.TOKEN_KEY!);
+        console.log("Decoded token:", decoded);
+
+        req.user = decoded;
+    } catch (error) {
+        console.log("invalid token");
+        return res.status(401).send("invalid token");
     }
 
     next();
