@@ -1,14 +1,20 @@
-import { channel } from "diagnostics_channel";
-import mongoose from "mongoose";
+import mongoose, { Document, Model, Schema } from "mongoose";
+import { IChannel } from "./Channel";
 
-const { Schema } = mongoose;
+export interface IUser extends Document {
+    username: string;
+    email: string;
+    password: string;
+    channel: mongoose.Types.ObjectId | IChannel;
+    followingChannels: mongoose.Types.ObjectId[];
+}
 
-const userSchema = new Schema({
+const userSchema = new Schema<IUser>({
     username: { type: String },
     email: { type: String, unique: true },
     password: { type: String },
     channel: { type: Schema.Types.ObjectId, ref: "Channel" },
-    followingChannels: { type: [{ type: Schema.Types.ObjectId, ref: "Channel" }] },
+    followingChannels: [{ type: Schema.Types.ObjectId, ref: "Channel" }],
 });
 
-export default mongoose.model("User", userSchema);
+export default mongoose.model<IUser>("User", userSchema);
