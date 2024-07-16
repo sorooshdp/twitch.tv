@@ -1,4 +1,4 @@
-import mongoose, { Document, Model, Schema } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 import { IChannel } from "./Channel";
 
 export interface IUser extends Document {

@@ -1,6 +1,5 @@
 import express from "express";
-import { validateChannelId } from "../middlewares/validation.js";
-import { getChannelDetails, getChannels } from "../controllers/controllers.js";
+import { getChannelDetails, getChannels } from "../controllers/channels/getChannelDetails";
 
 const router = express.Router();
 

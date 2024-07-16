@@ -1,12 +1,24 @@
 import { Request, Response, NextFunction } from "express";
 import User from "../../models/User.js";
 import Channel from "../../models/Channel.js";
+
+/**
+ * Represents a user with a userId.
+ */
 interface User {
     userId: string;
 }
+
+/**
+ * Extends the Express Request interface to include an optional user property.
+ */
 interface AuthRequest extends Request {
     user?: User;
 }
+
+/**
+ * Represents the structure of channel data returned from the database.
+ */
 interface ChannelData {
     _id: string;
     title: string;
@@ -14,18 +26,27 @@ interface ChannelData {
     isActive: boolean;
 }
 
-export const getChannelDetails = async (req: Request, res: Response) => {
+/**
+ * Retrieves details for a specific channel.
+ * 
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @returns {Promise<Response>} A promise that resolves to the response sent to the client.
+ * 
+ * @throws {Error} If there's an issue retrieving channel details.
+ */
+export const getChannelDetails = async (req: Request, res: Response): Promise<Response> => {
     try {
         const { channelId } = req.params;
         const channel = await Channel.findById(channelId);
 
         if (!channel) {
-            return res.status(404).send(" channel not found ");
+            return res.status(404).send("Channel not found");
         }
 
         const user = await User.findOne({ channel: channelId }, { username: 1 });
-        const streamUrl = "http";
-        const isOnline = false;
+        const streamUrl = "http"; // TODO: Implement dynamic stream URL generation
+        const isOnline = false; // TODO: Implement real-time online status checking
 
         return res.status(200).json({
             id: channel._id,
@@ -36,12 +57,21 @@ export const getChannelDetails = async (req: Request, res: Response) => {
             streamUrl,
         });
     } catch (e) {
-        console.log(e);
-        return res.status(500).send(" somthing went wrong on getChannelDetails");
+        console.error("Error in getChannelDetails:", e);
+        return res.status(500).send("Something went wrong on getChannelDetails");
     }
 };
 
-export const getChannels = async (_: Request, res: Response) => {
+/**
+ * Retrieves a list of all channels.
+ * 
+ * @param {Request} _ - The Express request object (unused).
+ * @param {Response} res - The Express response object.
+ * @returns {Promise<Response>} A promise that resolves to the response sent to the client.
+ * 
+ * @throws {Error} If there's an issue fetching channels.
+ */
+export const getChannels = async (_: Request, res: Response): Promise<Response> => {
     try {
         const users = await User.find({}, { channel: 1, username: 1 }).populate<{ channel: ChannelData & Document }>(
             "channel"
@@ -56,29 +86,39 @@ export const getChannels = async (_: Request, res: Response) => {
                 title: user.channel.title,
                 avatarUrl: user.channel.avatarUrl,
                 username: user.username,
-                isOnline: false,
+                isOnline: false, // TODO: Implement real-time online status checking
             }));
 
-        res.json(channels);
+        return res.json(channels);
     } catch (e) {
         console.error("Error fetching channels:", e);
-        res.status(500).json({ error: "Internal server error" });
+        return res.status(500).json({ error: "Internal server error" });
     }
 };
 
-export const getChannelsSettings = async (req: Request, res: Response, next: NextFunction) => {
+/**
+ * Retrieves channel settings for the authenticated user.
+ * 
+ * @param {Request} req - The Express request object.
+ * @param {Response} res - The Express response object.
+ * @param {NextFunction} next - The Express next middleware function.
+ * @returns {Promise<Response>} A promise that resolves to the response sent to the client.
+ * 
+ * @throws {Error} If there's an issue retrieving channel settings.
+ */
+export const getChannelsSettings = async (req: Request, res: Response, next: NextFunction): Promise<Response> => {
     try {
         const authReq = req as AuthRequest;
         const userId = authReq.user?.userId;
+
+        if (!userId) {
+            return res.status(401).send("User not authenticated");
+        }
 
         const userData = await User.findById(userId, {
             channel: 1,
             username: 1,
         }).populate("channel");
-
-        if (!userId) {
-            return res.status(401).send("User not authenticated");
-        }
 
         if (!userData?.channel || !("title" in userData.channel)) {
             return res.status(404).send("Channel not found");
@@ -94,12 +134,22 @@ export const getChannelsSettings = async (req: Request, res: Response, next: Nex
             streamKey: userData?.channel.streamKey,
         });
     } catch (e) {
-        console.log(e);
+        console.error("Error in getChannelsSettings:", e);
         return res.status(500).send("Something went wrong on getChannels");
     }
 };
 
-export const putChannelSettings = async (req: AuthRequest, res: Response, next: NextFunction) => {
+/**
+ * Updates channel settings for the authenticated user.
+ * 
+ * @param {AuthRequest} req - The authenticated Express request object.
+ * @param {Response} res - The Express response object.
+ * @param {NextFunction} next - The Express next middleware function.
+ * @returns {Promise<Response>} A promise that resolves to the response sent to the client.
+ * 
+ * @throws {Error} If there's an issue updating channel settings.
+ */
+export const putChannelSettings = async (req: AuthRequest, res: Response, next: NextFunction): Promise<Response> => {
     try {
         console.log(req.body);
 
