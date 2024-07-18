@@ -3,9 +3,9 @@ import cors from "cors";
 import https from "https"
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import authRoutes from "./src/routes/authRoutes.js";
-import channelsRoutes from "./src/routes/channelsRoutes.js";
-import settingsRoutes from "./src/routes/settingsRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+import channelsRoutes from "./routes/channelsRoutes.js";
+import settingsRoutes from "./routes/settingsRoutes.js";
 import fs from "fs";
 
 dotenv.config();
@@ -22,10 +22,6 @@ app.use(cors({
   credentials: true
 }));
 
-app.get("/", (req, res) => {
-    return res.send("Hello!");
-});
-
 app.options('*', cors());
 
 app.use("/api/auth", authRoutes);
@@ -33,8 +29,8 @@ app.use("/api/channels", channelsRoutes);
 app.use("/api/settings", settingsRoutes);
 
 const httpsOptions = {
-    key: fs.readFileSync('./cert.key'),
-    cert: fs.readFileSync('./cert.crt')
+    key: fs.readFileSync('../cert.key'),
+    cert: fs.readFileSync('../cert.crt')
 };
 
 const server =  https.createServer(httpsOptions, app);

@@ -2,18 +2,8 @@ import { Request, Response } from "express";
 import User from "../../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { LoginRequestBody } from "../../types/auth.js";
 
-interface LoginRequestBody {
-    email: string;
-    password: string;
-}
-
-interface User {
-    _id: string;
-    email: string;
-    password?: string;
-    username?: string;
-}
 
 export const postLogin = async (req: Request<{}, {}, LoginRequestBody>, res: Response): Promise<Response> => {
     try {

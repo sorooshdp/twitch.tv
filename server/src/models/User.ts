@@ -1,13 +1,5 @@
-import mongoose, { Document, Schema } from "mongoose";
-import { IChannel } from "./Channel";
-
-export interface IUser extends Document {
-    username: string;
-    email: string;
-    password: string;
-    channel: mongoose.Types.ObjectId | IChannel;
-    followingChannels: mongoose.Types.ObjectId[];
-}
+import mongoose, { Schema } from "mongoose";
+import { IUser } from "../types/models";
 
 const userSchema = new Schema<IUser>({
     username: { type: String },

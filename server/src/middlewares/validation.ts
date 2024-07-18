@@ -1,24 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { AuthRequest, LoginRequestBody, RegisterRequestBody } from "../types/auth";
 const config = process.env;
 
-interface AuthRequest extends Request {
-    user?: jwt.JwtPayload | string;
-}
-
-interface RegisterRequestBody {
-    username: string;
-    email: string;
-    password: string;
-}
-
-interface LoginRequestBody {
-    email: string;
-    password: string;
-}
-
 const emailRegex = /\S+@\S+\.\S+/;
-const usernameRegex = /^[a-zA-Z0-9_]+$/;
 const passwordRegex = /^.{6,}$/;
 
 export const validateRegister = (

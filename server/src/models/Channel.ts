@@ -1,14 +1,6 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { v4 as uuid } from "uuid";
-
-export interface IChannel extends Document {
-    isActive: boolean;
-    title: string;
-    description: string;
-    avatarUrl: string;
-    streamKey: string;
-    messages: mongoose.Types.ObjectId[];
-}
+import { IChannel } from "../types/models";
 
 const channelSchema = new Schema<IChannel>({
     isActive: { type: Boolean, default: false },

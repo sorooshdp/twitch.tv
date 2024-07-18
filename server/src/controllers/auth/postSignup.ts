@@ -3,19 +3,8 @@ import User from "../../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import Channel from "../../models/Channel.js";
+import { SignupRequestBody } from "../../types/auth.js";
 
-interface SignupRequestBody {
-    username: string;
-    email: string;
-    password: string;
-}
-
-interface User {
-    _id: string;
-    username: string;
-    email: string;
-    password?: string;
-}
 
 export const postSignup = async (req: Request<{}, {}, SignupRequestBody>, res: Response): Promise<Response> => {
     try {

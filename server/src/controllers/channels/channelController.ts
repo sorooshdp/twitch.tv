@@ -1,30 +1,8 @@
 import { Request, Response } from "express";
-import User, { IUser } from "../../models/User.js";
+import User from "../../models/User.js";
 import Channel from "../../models/Channel.js";
-
-/**
- * Represents a user with a userId.
- */
-interface User {
-    userId: string;
-}
-
-/**
- * Extends the Express Request interface to include an optional user property.
- */
-interface CustomeReq extends Request {
-    user?: User;
-}
-
-/**
- * Represents the structure of channel data returned from the database.
- */
-interface ChannelData {
-    _id: string;
-    title: string;
-    avatarUrl: string;
-    isActive: boolean;
-}
+import { ChannelData } from "../../types/models.js";
+import { CustomeReq } from "../../types/auth.js";
 
 /**
  * Retrieves details for a specific channel.

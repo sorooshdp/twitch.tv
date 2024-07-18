@@ -1,14 +1,7 @@
 import { Request, Response } from "express";
 import User from "../../models/User.js";
 import bcrypt from "bcryptjs";
-
-interface User {
-    userId: string;
-}
-
-interface AuthRequest extends Request {
-    user?: User;
-}
+import { AuthRequest } from "../../types/auth.js";
 
 export const patchChangePassword = async (req: AuthRequest, res: Response) => {
     try {
