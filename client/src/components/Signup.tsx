@@ -4,7 +4,7 @@ import Input from "./Input";
 import { FormInfo, isEmail, isPassword } from "../ts/utils/Validation";
 import { useSignup } from "../ts/hooks/useSingup";
 
-const SignupPage: React.FC = () => {
+const Signup: React.FC = () => {
     const { signup, isLoading } = useSignup();
     const [formData, setFormData] = useState<FormInfo>({
         username: "",
@@ -144,4 +144,4 @@ const SignupPage: React.FC = () => {
     );
 };
 
-export default SignupPage;
+export default Signup;

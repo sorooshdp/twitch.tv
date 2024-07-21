@@ -4,7 +4,7 @@ import Input from "./Input";
 import { FormInfo, isEmail } from "../ts/utils/Validation";
 import { useLogin } from "../ts/hooks/useLogin";
 
-const LoginPage: React.FC = () => {
+const Login: React.FC = () => {
     const { login, isLoading } = useLogin();
     const [formData, setFormData] = useState<FormInfo>({
         username:"",
@@ -110,4 +110,4 @@ const LoginPage: React.FC = () => {
     );
 };
 
-export default LoginPage;
+export default Login;
