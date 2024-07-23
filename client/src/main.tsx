@@ -20,8 +20,8 @@ export const Root = () => {
     <Router>
       <Routes>
         <Route path="/" element={<App />} />
-        <Route path="/login" element={isAuthenticated() ? <Navigate to="/dashboard" replace /> : <Login />} />
-        <Route path="/signup" element={isAuthenticated() ? <Navigate to="/dashboard" replace /> : <Signup />} />
+        <Route path="/login" element={isAuthenticated() ? <Navigate to="/dashboard/channels" replace /> : <Login />} />
+        <Route path="/signup" element={isAuthenticated() ? <Navigate to="/dashboard/channels" replace /> : <Signup />} />
         <Route
           path="/dashboard/*"
           element={
