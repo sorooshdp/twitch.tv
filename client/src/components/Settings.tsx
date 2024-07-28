@@ -1,138 +1,102 @@
-import React, { useState, ChangeEvent } from 'react';
-
-interface InputProps {
-  label: string;
-  name: string;
-  value: string;
-  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
-  type?: string;
-}
-
-const Input: React.FC<InputProps> = ({ label, name, value, onChange, type = "text" }) => (
-  <div className="mb-4">
-    <label className="block text-secondary text-sm font-bold mb-2" htmlFor={name}>
-      {label}
-    </label>
-    <input
-      className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-dark border-primary text-secondary"
-      id={name}
-      type={type}
-      name={name}
-      value={value}
-      onChange={onChange}
-    />
-  </div>
-);
-
-interface ChannelInfo {
-  title: string;
-  description: string;
-  avatarUrl: string;
-  username: string;
-}
-
-interface PasswordChange {
-  currentPassword: string;
-  newPassword: string;
-}
+import React, { useState } from 'react';
+import { useChannelInfo } from '../ts/hooks/useChannelInfo';
 
 const SettingsPage: React.FC = () => {
-  const [channelInfo, setChannelInfo] = useState<ChannelInfo>({
-    title: '',
-    description: '',
-    avatarUrl: '',
-    username: ''
-  });
+  const { channelInfo, isLoading, error } = useChannelInfo();
+  const [showStreamKey, setShowStreamKey] = useState(false);
 
-  const [passwordChange, setPasswordChange] = useState<PasswordChange>({
-    currentPassword: '',
-    newPassword: ''
-  });
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-dark text-secondary flex flex-col items-center justify-center">
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p className="text-lg">Loading channel information...</p>
+      </div>
+    );
+  }
 
-  const [streamKey, setStreamKey] = useState<string>('••••••••••••••••');
-  const [showStreamKey, setShowStreamKey] = useState<boolean>(false);
+  if (error) {
+    return (
+      <div className="min-h-screen bg-dark text-secondary flex items-center justify-center p-4">
+        <div className="bg-red-900 border-l-4 border-red-500 text-secondary p-4 max-w-md w-full" role="alert">
+          <p className="font-bold">Error</p>
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setChannelInfo(prev => ({ ...prev, [name]: value }));
-  };
+  if (!channelInfo) {
+    return (
+      <div className="min-h-screen bg-dark text-secondary flex items-center justify-center p-4">
+        <div className="bg-yellow-900 border-l-4 border-yellow-500 text-secondary p-4 max-w-md w-full" role="alert">
+          <p className="font-bold">No Information Available</p>
+          <p>Channel information could not be retrieved. Please try again later.</p>
+        </div>
+      </div>
+    );
+  }
 
-  const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setPasswordChange(prev => ({ ...prev, [name]: value }));
-  };
-
-  const toggleStreamKey = () => {
+  const toggleStreamKeyVisibility = () => {
     setShowStreamKey(!showStreamKey);
   };
 
-  const handlePasswordSubmit = () => {
-    // Here you would typically send a request to your backend to change the password
-    console.log('Password change submitted:', passwordChange);
-    // Reset password fields after submission
-    setPasswordChange({ currentPassword: '', newPassword: '' });
-  };
-
   return (
-    <div className="min-h-screen bg-dark text-secondary p-8">
+    <div className="max-h-full bg-dark text-secondary p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold mb-8 text-primary">Channel Settings</h1>
         
         <div className="bg-[#0D1B1E] rounded-lg p-6 mb-8 shadow-lg backdrop-blur-sm bg-opacity-50">
           <h2 className="text-2xl font-semibold mb-6 text-primary">Channel Information</h2>
-          <Input
-            label="Channel Title"
-            name="title"
-            value={channelInfo.title}
-            onChange={handleInputChange}
-          />
-          <Input
-            label="Description"
-            name="description"
-            value={channelInfo.description}
-            onChange={handleInputChange}
-          />
-          <Input
-            label="Avatar URL"
-            name="avatarUrl"
-            value={channelInfo.avatarUrl}
-            onChange={handleInputChange}
-          />
-          <Input
-            label="Username"
-            name="username"
-            value={channelInfo.username}
-            onChange={handleInputChange}
-          />
-          <button className="mt-8 bg-primary text-dark py-2 px-6 rounded-full hover:bg-opacity-80 transition duration-300 flex items-center">
-            <span className="mr-2">💾</span>
-            Save Changes
-          </button>
-        </div>
-        
-        <div className="bg-[#0D1B1E] rounded-lg p-6 mb-8 shadow-lg backdrop-blur-sm bg-opacity-50">
-          <h2 className="text-2xl font-semibold mb-6 text-primary">Change Password</h2>
-          <Input
-            label="Current Password"
-            name="currentPassword"
-            type="password"
-            value={passwordChange.currentPassword}
-            onChange={handlePasswordChange}
-          />
-          <Input
-            label="New Password"
-            name="newPassword"
-            type="password"
-            value={passwordChange.newPassword}
-            onChange={handlePasswordChange}
-          />
-          <button 
-            onClick={handlePasswordSubmit}
-            className="mt-4 bg-primary text-dark py-2 px-6 rounded-full hover:bg-opacity-80 transition duration-300 flex items-center"
-          >
-            <span className="mr-2">🔒</span>
-            Change Password
-          </button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-secondary text-sm font-bold mb-2" htmlFor="title">
+                Channel Title
+              </label>
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-dark border-primary text-secondary"
+                id="title"
+                type="text"
+                value={channelInfo.title}
+                readOnly
+              />
+            </div>
+            <div>
+              <label className="block text-secondary text-sm font-bold mb-2" htmlFor="description">
+                Description
+              </label>
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-dark border-primary text-secondary"
+                id="description"
+                type="text"
+                value={channelInfo.description}
+                readOnly
+              />
+            </div>
+            <div>
+              <label className="block text-secondary text-sm font-bold mb-2" htmlFor="avatarUrl">
+                Avatar URL
+              </label>
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-dark border-primary text-secondary"
+                id="avatarUrl"
+                type="text"
+                value={channelInfo.avatarUrl}
+                readOnly
+              />
+            </div>
+            <div>
+              <label className="block text-secondary text-sm font-bold mb-2" htmlFor="username">
+                Username
+              </label>
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-dark border-primary text-secondary"
+                id="username"
+                type="text"
+                value={channelInfo.username}
+                readOnly
+              />
+            </div>
+          </div>
         </div>
         
         <div className="bg-[#0D1B1E] rounded-lg p-6 shadow-lg backdrop-blur-sm bg-opacity-50">
@@ -148,22 +112,27 @@ const SettingsPage: React.FC = () => {
             <div className="flex items-center space-x-4">
               <input
                 type={showStreamKey ? "text" : "password"}
-                value={streamKey}
+                value={channelInfo.streamKey}
                 readOnly
                 className="bg-dark border border-primary rounded px-3 py-1 text-secondary"
               />
-              <button 
-                onClick={toggleStreamKey}
-                className="text-primary hover:text-opacity-80 transition duration-300"
+              <button
+                onClick={toggleStreamKeyVisibility}
+                className="p-2 bg-primary text-dark rounded hover:bg-primary-dark transition-colors"
               >
-                {showStreamKey ? 'Hide' : 'Show'}
+                {showStreamKey ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                )}
               </button>
             </div>
           </div>
-          <button className="mt-6 text-primary hover:text-opacity-80 transition duration-300 flex items-center">
-            <span className="mr-2">Advanced stream settings</span>
-            <span>▶</span>
-          </button>
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import App from "./App";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
@@ -15,17 +15,47 @@ const isAuthenticated = () => {
   return token !== null;
 };
 
+const AuthenticatedRoute = ({ children }: { children: React.ReactNode }) => {
+  const navigate = useNavigate();
+  const [isAuth, setIsAuth] = useState(isAuthenticated());
+
+  useEffect(() => {
+    const checkAuth = () => {
+      const auth = isAuthenticated();
+      setIsAuth(auth);
+      if (!auth) {
+        navigate('/login');
+      }
+    };
+
+    checkAuth();
+    window.addEventListener('storage', checkAuth);
+
+    return () => {
+      window.removeEventListener('storage', checkAuth);
+    };
+  }, [navigate]);
+
+  return isAuth ? <>{children}</> : null;
+};
+
 export const Root = () => {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<App />} />
-        <Route path="/login" element={isAuthenticated() ? <Navigate to="/dashboard/channels" replace /> : <Login />} />
-        <Route path="/signup" element={isAuthenticated() ? <Navigate to="/dashboard/channels" replace /> : <Signup />} />
+        <Route 
+          path="/login" 
+          element={isAuthenticated() ? <Navigate to="/dashboard/channels" replace /> : <Login />} 
+        />
+        <Route 
+          path="/signup" 
+          element={isAuthenticated() ? <Navigate to="/dashboard/channels" replace /> : <Signup />} 
+        />
         <Route
           path="/dashboard/*"
           element={
-            isAuthenticated() ? (
+            <AuthenticatedRoute>
               <Dashboard>
                 <Routes>
                   <Route path="settings" element={<Settings />} />
@@ -33,9 +63,7 @@ export const Root = () => {
                   <Route path="channels/:id" element={<Channel />} />
                 </Routes>
               </Dashboard>
-            ) : (
-              <Navigate to="/login" replace />
-            )
+            </AuthenticatedRoute>
           }
         />
       </Routes>

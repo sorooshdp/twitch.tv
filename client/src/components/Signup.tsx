@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Input from "./Input";
 import { FormInfo, isEmail, isPassword } from "../ts/utils/Validation";
-import { useSignup } from "../ts/hooks/useSingup";
+import { useAuth } from "../ts/hooks/useAuth";
 
 const Signup: React.FC = () => {
-    const { signup, isLoading } = useSignup();
+    const { signup, isLoading } = useAuth();
     const [formData, setFormData] = useState<FormInfo>({
         username: "",
         email: "",
@@ -54,11 +54,11 @@ const Signup: React.FC = () => {
         setIsFormValid(isValid);
     };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (isFormValid) {
             console.log("Form is valid. Submitting...", formData);
-            signup(formData.username, formData.email, formData.password);
+            await signup(formData.username, formData.email, formData.password);
         } else {
             console.log("Form is invalid");
         }

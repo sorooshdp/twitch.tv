@@ -58,6 +58,7 @@ export const validateChannelId = (req: Request<{}, {}>, res: Response, next: Nex
 };
 
 export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction) => {
+    console.log("in verifyToken")
     let token = req.body.token || req.query.token || req.header("Authorization");
 
     if (!token) {
@@ -66,13 +67,13 @@ export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction)
     }
 
     try {
+        console.log(token);
         token = token.replace(/^Bearer\s+/, "");
         const decoded = jwt.verify(token, config.TOKEN_KEY!);
         console.log("Decoded token:", decoded);
 
         req.user = decoded;
     } catch (error) {
-        console.log("invalid token");
         return res.status(401).send("invalid token");
     }
 
