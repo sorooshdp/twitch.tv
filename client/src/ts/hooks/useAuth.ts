@@ -1,13 +1,12 @@
 import { useState } from "react";
-import axios, { AxiosResponse } from "axios";
+import  axios, { AxiosResponse } from "axios";
 import { useNavigate } from "react-router-dom";
 
-const api = axios.create({
-  baseURL: "https://localhost:5514/api",
-  timeout: 5000,
-  withCredentials: true,
+export const api = axios.create({
+    baseURL: "https://localhost:5514/api",
+    timeout: 5000,
+    withCredentials: true,
 });
-
 type AuthData = {
   username?: string;
   email: string;
