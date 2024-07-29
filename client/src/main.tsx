@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate  } from "react-router-dom";
 import App from "./App";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
@@ -11,32 +11,11 @@ import Channel from "./components/Channel";
 import Settings from "./components/Settings";
 
 const isAuthenticated = () => {
-  const token = localStorage.getItem("TOKEN");
-  return token !== null;
+  return localStorage.getItem("TOKEN") !== null;
 };
 
-const AuthenticatedRoute = ({ children }: { children: React.ReactNode }) => {
-  const navigate = useNavigate();
-  const [isAuth, setIsAuth] = useState(isAuthenticated());
-
-  useEffect(() => {
-    const checkAuth = () => {
-      const auth = isAuthenticated();
-      setIsAuth(auth);
-      if (!auth) {
-        navigate('/login');
-      }
-    };
-
-    checkAuth();
-    window.addEventListener('storage', checkAuth);
-
-    return () => {
-      window.removeEventListener('storage', checkAuth);
-    };
-  }, [navigate]);
-
-  return isAuth ? <>{children}</> : null;
+const PrivateRoute = ({ children }) => {
+  return isAuthenticated() ? children : <Navigate to="/login" />;
 };
 
 export const Root = () => {
@@ -46,26 +25,24 @@ export const Root = () => {
         <Route path="/" element={<App />} />
         <Route 
           path="/login" 
-          element={isAuthenticated() ? <Navigate to="/dashboard/channels" replace /> : <Login />} 
+          element={isAuthenticated() ? <Navigate to="/dashboard/channels" /> : <Login />} 
         />
         <Route 
           path="/signup" 
-          element={isAuthenticated() ? <Navigate to="/dashboard/channels" replace /> : <Signup />} 
+          element={isAuthenticated() ? <Navigate to="/dashboard/channels" /> : <Signup />} 
         />
         <Route
-          path="/dashboard/*"
+          path="/dashboard"
           element={
-            <AuthenticatedRoute>
-              <Dashboard>
-                <Routes>
-                  <Route path="settings" element={<Settings />} />
-                  <Route path="channels" element={<Channels />} />
-                  <Route path="channels/:id" element={<Channel />} />
-                </Routes>
-              </Dashboard>
-            </AuthenticatedRoute>
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
           }
-        />
+        >
+          <Route path="settings" element={<Settings />} />
+          <Route path="channels" element={<Channels />} />
+          <Route path="channels/:id" element={<Channel />} />
+        </Route>
       </Routes>
     </Router>
   );
