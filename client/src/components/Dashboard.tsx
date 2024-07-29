@@ -39,7 +39,6 @@ const Dashboard: React.FC<{ children?: ReactNode }> = ({ children }) => {
                         },
                     }
                 );
-                console.log(response);
                 const sortedChannels = response.data.followingChannels.sort((a, b) => {
                     if (a.isActive === b.isActive) return 0;
                     return a.isActive ? -1 : 1;

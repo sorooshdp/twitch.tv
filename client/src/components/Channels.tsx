@@ -1,43 +1,69 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 interface ChannelProps {
-  id: number;
-  name: string;
-  viewers: number;
-  thumbnailUrl: string;
-  iconUrl: string;
+  id: string;
+  title: string;
+  avatarUrl: string;
+  username: string;
+  isOnline: boolean;
+  viewers?: number; // Make this optional as it's not provided by the backend
 }
 
-const ChannelCard: React.FC<ChannelProps> = ({ name, viewers, thumbnailUrl, iconUrl }) => (
+const ChannelCard: React.FC<ChannelProps> = ({ title, viewers, avatarUrl, username, isOnline }) => (
   <div className="bg-secondary/10 rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-105">
     <div className="relative aspect-video">
-      <img src={thumbnailUrl} alt={`${name}'s stream`} className="w-full h-full object-cover" />
-      <div className="absolute bottom-2 left-2 bg-red-600 text-white text-sm px-2 py-1 rounded">
-        LIVE
-      </div>
-      <div className="absolute bottom-2 right-2 bg-black/70 text-white text-sm px-2 py-1 rounded">
-        {viewers} viewers
-      </div>
+      <img src="/api/placeholder/400/225" alt={`${title}'s stream`} className="w-full h-full object-cover" />
+      {isOnline && (
+        <div className="absolute bottom-2 left-2 bg-red-600 text-white text-sm px-2 py-1 rounded">
+          LIVE
+        </div>
+      )}
+      {viewers !== undefined && (
+        <div className="absolute bottom-2 right-2 bg-black/70 text-white text-sm px-2 py-1 rounded">
+          {viewers} viewers
+        </div>
+      )}
     </div>
     <div className="p-3 flex items-center">
-      <img src={iconUrl} alt={`${name}'s icon`} className="w-10 h-10 rounded-full mr-3" />
+      <img src={avatarUrl || "/api/placeholder/40/40"} alt={`${username}'s icon`} className="w-10 h-10 rounded-full mr-3" />
       <div>
-        <h3 className="font-bold text-white">{name}</h3>
-        <p className="text-sm text-gray-300">Just Chatting</p>
+        <h3 className="font-bold text-white">{title}</h3>
+        <p className="text-sm text-gray-300">{username}</p>
       </div>
     </div>
   </div>
 );
 
 const Channels: React.FC = () => {
-  const channels: ChannelProps[] = [
-    { id: 1, name: "GameMaster", viewers: 1500, thumbnailUrl: "https://i.redd.it/9-japanese-cyberpunk-2912x1632-ai-v0-a949vywg5ekb1.jpg?width=2912&format=pjpg&auto=webp&s=28a702a25dfe81367ca6949069cbfb9e519c7553", iconUrl: "/api/placeholder/40/40" },
-    { id: 2, name: "StreamQueen", viewers: 2200, thumbnailUrl: "https://i.redd.it/9-japanese-cyberpunk-2912x1632-ai-v0-a949vywg5ekb1.jpg?width=2912&format=pjpg&auto=webp&s=28a702a25dfe81367ca6949069cbfb9e519c7553", iconUrl: "/api/placeholder/40/40" },
-    { id: 3, name: "TechWizard", viewers: 800, thumbnailUrl: "https://i.redd.it/9-japanese-cyberpunk-2912x1632-ai-v0-a949vywg5ekb1.jpg?width=2912&format=pjpg&auto=webp&s=28a702a25dfe81367ca6949069cbfb9e519c7553", iconUrl: "/api/placeholder/40/40" },
-    { id: 4, name: "CasualGamer", viewers: 1200, thumbnailUrl: "https://i.redd.it/9-japanese-cyberpunk-2912x1632-ai-v0-a949vywg5ekb1.jpg?width=2912&format=pjpg&auto=webp&s=28a702a25dfe81367ca6949069cbfb9e519c7553", iconUrl: "/api/placeholder/40/40" },
-    { id: 5, name: "SpeedRunner", viewers: 3000, thumbnailUrl: "https://i.redd.it/9-japanese-cyberpunk-2912x1632-ai-v0-a949vywg5ekb1.jpg?width=2912&format=pjpg&auto=webp&s=28a702a25dfe81367ca6949069cbfb9e519c7553", iconUrl: "/api/placeholder/40/40" },
-    { id: 6, name: "eSportsChamp", viewers: 5000, thumbnailUrl: "https://i.redd.it/9-japanese-cyberpunk-2912x1632-ai-v0-a949vywg5ekb1.jpg?width=2912&format=pjpg&auto=webp&s=28a702a25dfe81367ca6949069cbfb9e519c7553", iconUrl: "/api/placeholder/40/40" },
-  ];
+  const [channels, setChannels] = useState<ChannelProps[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchChannels = async () => {
+      try {
+        const response = await axios.get<ChannelProps[]>('https://localhost:5514/api/channels');
+        setChannels(response.data);
+        console.log(response.data)
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching channels:', err);
+        setError('Failed to fetch channels. Please try again later.');
+        setLoading(false);
+      }
+    };
+
+    fetchChannels();
+  }, []);
+
+  if (loading) {
+    return <div className="text-center p-4">Loading channels...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center p-4 text-red-500">{error}</div>;
+  }
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
