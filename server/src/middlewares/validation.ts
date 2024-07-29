@@ -67,10 +67,8 @@ export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction)
     }
 
     try {
-        console.log(token);
         token = token.replace(/^Bearer\s+/, "");
         const decoded = jwt.verify(token, config.TOKEN_KEY!);
-        console.log("Decoded token:", decoded);
 
         req.user = decoded;
     } catch (error) {

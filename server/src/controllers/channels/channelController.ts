@@ -214,16 +214,23 @@ export const getFollowingChannels = async (req: CustomeReq, res: Response) => {
         if (!req.user) {
             return res.status(401).json({ error: "User not authenticated" });
         }
+
         const { userId } = req.user;
-        const user = await User.findById(userId, { followingChannels: 1 });
-        
+
+        const user = await User.findById(userId).populate({
+            path: 'followingChannels',
+            select: 'isActive title description avatarUrl streamKey'
+        });
+        console.log("Populated user: ", user);
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
 
-        return res.status(200).json({
-            followingChannels: user.followingChannels,
-        });
+        const followingChannels = user.followingChannels;
+
+        console.log("following channels: ", followingChannels);
+
+        return res.status(200).json({ followingChannels });
     } catch (e) {
         console.error("Something went wrong on getFollowingChannels: ", e);
         res.status(500).send("Something went wrong on getFollowingChannels");
