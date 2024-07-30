@@ -55,7 +55,7 @@ export const getChannels = async (_: Request, res: Response): Promise<Response> 
             "channel"
         );
 
-        console.log(users);
+        console.log("All users:" + users);
 
         const channels = users
             .filter((user) => user.channel)
@@ -63,6 +63,7 @@ export const getChannels = async (_: Request, res: Response): Promise<Response> 
                 id: user.channel._id,
                 title: user.channel.title,
                 avatarUrl: user.channel.avatarUrl,
+                thumbnailUrl : user.channel.thumbnailUrl,
                 username: user.username,
                 isOnline: false, // TODO: Implement real-time online status checking
             }));
@@ -109,6 +110,7 @@ export const getChannelsSettings = async (req: Request, res: Response): Promise<
             title: userData?.channel.title,
             description: userData?.channel.description,
             avatarUrl: userData?.channel.avatarUrl,
+            thumbnailUrl: userData.channel.thumbnailUrl,
             streamKey: userData?.channel.streamKey,
         });
     } catch (e) {
@@ -133,7 +135,7 @@ export const putChannelSettings = async (req: CustomeReq, res: Response): Promis
         }
 
         const { userId } = req.user;
-        const { title, description, username, avatarUrl } = req.body;
+        const { title, description, username, avatarUrl, thumbnailUrl } = req.body;
 
         if (!userId || typeof userId !== "string") {
             return res.status(400).json({ error: "Invalid userId" });
@@ -159,6 +161,7 @@ export const putChannelSettings = async (req: CustomeReq, res: Response): Promis
                 title,
                 description,
                 avatarUrl,
+                thumbnailUrl,
                 isActive: true,
             },
             { new: true }
@@ -174,6 +177,7 @@ export const putChannelSettings = async (req: CustomeReq, res: Response): Promis
             title: channelData.title,
             description: channelData.description,
             avatarUrl: channelData.avatarUrl,
+            thumbnailUrl: channelData.thumbnailUrl
         });
     } catch (e) {
         console.error("Error from putChannelSettings:", e);
@@ -218,8 +222,8 @@ export const getFollowingChannels = async (req: CustomeReq, res: Response) => {
         const { userId } = req.user;
 
         const user = await User.findById(userId).populate({
-            path: 'followingChannels',
-            select: 'isActive title description avatarUrl streamKey'
+            path: "followingChannels",
+            select: "isActive title description avatarUrl streamKey",
         });
         console.log("Populated user: ", user);
         if (!user) {

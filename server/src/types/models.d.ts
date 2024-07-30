@@ -21,6 +21,7 @@ export interface IChannel extends Document {
     title: string;
     description: string;
     avatarUrl: string;
+    thumbnailUrl: string;
     streamKey: string;
     messages: mongoose.Types.ObjectId[];
 }
@@ -29,5 +30,6 @@ interface ChannelData {
     _id: string;
     title: string;
     avatarUrl: string;
+    thumbnailUrl: string;
     isActive: boolean;
 }
