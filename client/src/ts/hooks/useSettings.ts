@@ -8,6 +8,7 @@ interface ChannelInfo {
     description: string;
     avatarUrl: string;
     streamKey: string;
+    thumbnailUrl : string;
 }
 
 interface UpdateChannelInfoParams {
@@ -15,6 +16,7 @@ interface UpdateChannelInfoParams {
     title: string;
     description: string;
     avatarUrl: string;
+    thumbnailUrl: string;
 }
 
 export const useSettings = () => {

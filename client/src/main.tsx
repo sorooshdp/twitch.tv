@@ -1,4 +1,4 @@
-import React from "react";
+import React , {ReactNode} from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import App from "./App";
 import Login from "./components/Login";
@@ -14,7 +14,7 @@ const isAuthenticated = () => {
     return localStorage.getItem("TOKEN") !== null;
 };
 
-const PrivateRoute = ({ children }) => {
+const PrivateRoute: React.FC<{children: ReactNode}> = ({ children }) => {
     return isAuthenticated() ? <>{children}</> : <Navigate to="/login" />;
 };
 

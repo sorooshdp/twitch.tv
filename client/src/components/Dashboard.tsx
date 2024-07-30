@@ -3,12 +3,12 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 interface Channel {
-  _id: string;
-  isActive: boolean;
-  title: string;
-  description: string;
-  avatarUrl: string;
-  streamKey: string;
+    _id: string;
+    isActive: boolean;
+    title: string;
+    description: string;
+    avatarUrl: string;
+    streamKey: string;
 }
 
 const Logo = ({ size = 40 }) => (
@@ -124,6 +124,8 @@ const Dashboard: React.FC<{ children?: ReactNode }> = ({ children }) => {
                             <p>Loading channels...</p>
                         ) : error ? (
                             <p className="text-red-500">{error}</p>
+                        ) : channels.length === 0 ? ( // Check if the channels array is empty
+                            <p>No channels followed</p>
                         ) : (
                             channels.map((channel) => (
                                 <div

@@ -5,6 +5,7 @@ interface FormData {
     title: string;
     description: string;
     avatarUrl: string;
+thumbnailUrl: string; 
 }
 
 interface ChannelInfoFormProps {
@@ -23,7 +24,7 @@ export const ChannelInfoForm: React.FC<ChannelInfoFormProps> = React.memo(
         >
             <h2 className="text-2xl font-semibold mb-6 text-primary">Channel Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {(["title", "description", "avatarUrl", "username"] as const).map((field) => (
+                {(["title", "description", "avatarUrl", "username", "thumbnailUrl"] as const).map((field) => (
                     <div key={field}>
                         <label className="block text-secondary text-sm font-bold mb-2" htmlFor={field}>
                             {field.charAt(0).toUpperCase() + field.slice(1)}
@@ -48,7 +49,7 @@ export const ChannelInfoForm: React.FC<ChannelInfoFormProps> = React.memo(
                     {isUpdating ? "Updating..." : "Update Channel Info"}
                 </button>
             </div>
-            {updateError && <div className="mt-4 text-red-500">{updateError}</div>}
+            {updateError && <p className="text-red-500 mt-4">{updateError}</p>}
         </form>
     )
 );

@@ -10,6 +10,7 @@ interface FormData {
     title: string;
     description: string;
     avatarUrl: string;
+    thumbnailUrl: string;
 }
 
 interface PasswordData {
@@ -30,6 +31,7 @@ const SettingsPage: React.FC = () => {
         title: "",
         description: "",
         avatarUrl: "",
+        thumbnailUrl: "",
     });
 
     const [passwordData, setPasswordData] = useState<PasswordData>({
@@ -45,6 +47,7 @@ const SettingsPage: React.FC = () => {
                 title: channelInfo.title,
                 description: channelInfo.description,
                 avatarUrl: channelInfo.avatarUrl,
+                thumbnailUrl: channelInfo.thumbnailUrl,
             });
         }
     }, [channelInfo]);
