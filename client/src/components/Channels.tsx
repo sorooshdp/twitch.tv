@@ -13,7 +13,7 @@ interface ChannelProps {
 }
 
 const ChannelCard: React.FC<ChannelProps> = ({ id, title, viewers, avatarUrl, thumbnailUrl, username, isOnline }) => (
-    <Link to={`dashboard/channels/${id}`} className="block">
+    <Link to={`${id}`} className="block">
         <div className="bg-secondary/10 rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-105">
             <div className="relative aspect-video">
                 <img src={thumbnailUrl} alt={`${title}'s stream`} className="w-full h-full object-cover" />

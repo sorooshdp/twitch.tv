@@ -167,7 +167,7 @@ const Dashboard: React.FC<{ children?: ReactNode }> = ({ children }) => {
                 </div>
 
                 {/* Main content */}
-                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-dark/80 p-4">{children}</main>
+                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-dark/80">{children}</main>
             </div>
         </div>
     );
