@@ -29,6 +29,7 @@ export const getChannelDetails = async (req: Request, res: Response): Promise<Re
         return res.status(200).json({
             id: channel._id,
             title: channel.title,
+            avatarUrl: channel.avatarUrl,
             description: channel.description,
             username: user?.username,
             isOnline,
@@ -210,6 +211,38 @@ export const postFollowChannel = async (req: CustomeReq, res: Response) => {
     } catch (e) {
         console.log("error on postFollowChannel: " + e);
         res.status(500).send("somthing went wrong on postFollowChannel.");
+    }
+};
+
+export const unfollowChannel = async (req: CustomeReq, res: Response) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({ error: "User not authenticated" });
+        }
+
+        const { userId } = req.user;
+        const { channelId } = req.body;
+
+        const userData = await User.findById(userId);
+
+        if (!userData) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const channelIndex = userData.followingChannels.indexOf(channelId);
+
+        if (channelIndex === -1) {
+            return res.status(400).json({ error: "You are not following this channel" });
+        }
+
+        userData.followingChannels.splice(channelIndex, 1);
+
+        await userData.save();
+
+        return res.status(200).json({ message: "Channel unfollowed successfully" });
+    } catch (e) {
+        console.error("Error on unfollowChannel:", e);
+        res.status(500).json({ error: "Something went wrong while unfollowing the channel" });
     }
 };
 
