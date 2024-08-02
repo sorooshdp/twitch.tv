@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import { ReactFlvPlayer } from "react-flv-player";
 
 interface ChannelDetails {
     id: string;
@@ -20,7 +21,7 @@ interface ChatMessage {
 
 const VideoPlayer: React.FC<{ streamUrl: string }> = ({ streamUrl }) => (
     <div className="bg-black aspect-video">
-        <div className="flex items-center justify-center h-full text-2xl">Video Player Placeholder</div>
+        <ReactFlvPlayer width='100%' height='100%' url={streamUrl} />
     </div>
 );
 

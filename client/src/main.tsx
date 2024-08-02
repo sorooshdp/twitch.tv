@@ -1,5 +1,5 @@
 import React , {ReactNode} from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import App from "./App";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
@@ -14,8 +14,9 @@ const isAuthenticated = () => {
     return localStorage.getItem("TOKEN") !== null;
 };
 
-const PrivateRoute: React.FC<{children: ReactNode}> = ({ children }) => {
-    return isAuthenticated() ? <>{children}</> : <Navigate to="/login" />;
+const PrivateRoute: React.FC<{ children: ReactNode }> = ({ children }) => {
+    const location = useLocation();
+    return isAuthenticated() ? <>{children}</> : <Navigate to="/login" state={{ from: location }} />;
 };
 
 export const Root = () => {
@@ -36,7 +37,7 @@ export const Root = () => {
                                 <Routes>
                                     <Route path="/settings" element={<Settings />} />
                                     <Route path="/channels" element={<Channels />} />
-                                    <Route path="/channels/:id" element={<Channel />} />
+                                    <Route path="/channels/:id" element={<Channel sidebarOpen={false} />} />
                                 </Routes>
                             </Dashboard>
                         </PrivateRoute>

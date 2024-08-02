@@ -4,6 +4,11 @@ import Channel from "../../models/Channel.js";
 import { ChannelData } from "../../types/models.js";
 import { CustomeReq } from "../../types/auth.js";
 
+const handleError = (res: Response, error: any, message: string): Response => {
+    console.error(`Error in ${message}:`, error);
+    return res.status(500).json({ error: `Something went wrong in ${message}` });
+};
+
 /**
  * Retrieves details for a specific channel.
  *
@@ -23,7 +28,7 @@ export const getChannelDetails = async (req: Request, res: Response): Promise<Re
         }
 
         const user = await User.findOne({ channel: channelId }, { username: 1 });
-        const streamUrl = "http"; // TODO: Implement dynamic stream URL generation
+        const streamUrl = "http://localhost:8000/live/254f543e-7a80-4fd0-a430-de8ac38c0d57.flv"; // TODO: Implement dynamic stream URL generation
         const isOnline = false; // TODO: Implement real-time online status checking
 
         return res.status(200).json({
@@ -36,8 +41,7 @@ export const getChannelDetails = async (req: Request, res: Response): Promise<Re
             streamUrl,
         });
     } catch (e) {
-        console.error("Error in getChannelDetails:", e);
-        return res.status(500).send("Something went wrong on getChannelDetails");
+        return handleError(res, e, "getChannelDetails");
     }
 };
 
@@ -64,15 +68,14 @@ export const getChannels = async (_: Request, res: Response): Promise<Response> 
                 id: user.channel._id,
                 title: user.channel.title,
                 avatarUrl: user.channel.avatarUrl,
-                thumbnailUrl : user.channel.thumbnailUrl,
+                thumbnailUrl: user.channel.thumbnailUrl,
                 username: user.username,
                 isOnline: false, // TODO: Implement real-time online status checking
             }));
 
         return res.json(channels);
     } catch (e) {
-        console.error("Error fetching channels:", e);
-        return res.status(500).json({ error: "Internal server error" });
+       return handleError(res, e, "getChannels");
     }
 };
 
@@ -115,8 +118,7 @@ export const getChannelsSettings = async (req: Request, res: Response): Promise<
             streamKey: userData?.channel.streamKey,
         });
     } catch (e) {
-        console.error("Error in getChannelsSettings:", e);
-        return res.status(500).send("Something went wrong on getChannels");
+       return handleError(res, e, "getChannelsSettings");
     }
 };
 
@@ -178,11 +180,10 @@ export const putChannelSettings = async (req: CustomeReq, res: Response): Promis
             title: channelData.title,
             description: channelData.description,
             avatarUrl: channelData.avatarUrl,
-            thumbnailUrl: channelData.thumbnailUrl
+            thumbnailUrl: channelData.thumbnailUrl,
         });
     } catch (e) {
-        console.error("Error from putChannelSettings:", e);
-        return res.status(500).json({ error: "Something went wrong on putChannelSettings" });
+        return handleError(res, e, "putChannelSettings")
     }
 };
 
@@ -209,8 +210,7 @@ export const postFollowChannel = async (req: CustomeReq, res: Response) => {
 
         return res.status(200).send("channel followed successfully");
     } catch (e) {
-        console.log("error on postFollowChannel: " + e);
-        res.status(500).send("somthing went wrong on postFollowChannel.");
+        return handleError(res, e, "postFollowChannel")
     }
 };
 
@@ -241,8 +241,7 @@ export const unfollowChannel = async (req: CustomeReq, res: Response) => {
 
         return res.status(200).json({ message: "Channel unfollowed successfully" });
     } catch (e) {
-        console.error("Error on unfollowChannel:", e);
-        res.status(500).json({ error: "Something went wrong while unfollowing the channel" });
+        return handleError(res, e, "unfollowChannel")
     }
 };
 
@@ -269,7 +268,6 @@ export const getFollowingChannels = async (req: CustomeReq, res: Response) => {
 
         return res.status(200).json({ followingChannels });
     } catch (e) {
-        console.error("Something went wrong on getFollowingChannels: ", e);
-        res.status(500).send("Something went wrong on getFollowingChannels");
+        return handleError(res, e, "getFollowingChannels")
     }
 };
