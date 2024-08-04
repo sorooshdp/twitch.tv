@@ -28,7 +28,7 @@ export const getChannelDetails = async (req: Request, res: Response): Promise<Re
         }
 
         const user = await User.findOne({ channel: channelId }, { username: 1 });
-        const streamUrl = "http://localhost:8000/live/254f543e-7a80-4fd0-a430-de8ac38c0d57.flv"; // TODO: Implement dynamic stream URL generation
+        const streamUrl = `http://localhost:8000/live/${channel.streamKey}.flv`; // TODO: Implement dynamic stream URL generation
         const isOnline = false; // TODO: Implement real-time online status checking
 
         return res.status(200).json({

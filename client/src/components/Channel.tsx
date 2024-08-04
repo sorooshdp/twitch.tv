@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import { ReactFlvPlayer } from "react-flv-player";
+import CustomFlvPlayer from "./CustomFlvPlayer";
 
 interface ChannelDetails {
     id: string;
@@ -20,8 +20,9 @@ interface ChatMessage {
 }
 
 const VideoPlayer: React.FC<{ streamUrl: string }> = ({ streamUrl }) => (
-    <div className="bg-black aspect-video">
-        <ReactFlvPlayer width='100%' height='100%' url={streamUrl} />
+    
+    <div className="w-full h-full bg-black aspect-video">
+        <CustomFlvPlayer streamUrl={streamUrl} />
     </div>
 );
 
@@ -109,6 +110,7 @@ const SingleChannelPage: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen }) 
             }
         };
         fetchChannelDetails();
+        console.log(channelDetails)
     }, [id]);
 
     const handleFollowToggle = async () => {

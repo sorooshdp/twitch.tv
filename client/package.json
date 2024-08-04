@@ -12,10 +12,10 @@
   "dependencies": {
     "@vitejs/plugin-basic-ssl": "^1.1.0",
     "axios": "^1.7.2",
+    "flv.js": "^1.6.2",
     "framer-motion": "^11.3.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-flv-player": "^1.0.9",
     "react-router-dom": "^6.23.1"
   },
   "devDependencies": {
