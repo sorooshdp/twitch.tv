@@ -10,9 +10,15 @@ const config = {
   },
   http: {
     port: 8000,
-    allow_origin: '*'
+    allow_origin: 'https://localhost:5514'
+  },
+  https: {
+    port: 8443,
+    key:'./key.pem',
+    cert:'./cert.pem',
   }
 };
+
 
 var nms = new NodeMediaServer(config)
 nms.run();
