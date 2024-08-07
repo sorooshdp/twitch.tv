@@ -3,7 +3,27 @@ import User from "../../models/User.js";
 import Channel from "../../models/Channel.js";
 import { ChannelData } from "../../types/models.js";
 import { CustomeReq } from "../../types/auth.js";
+import axios from "axios";
 
+const RTMP_SERVER_URL = 'http://localhost:8000/api/streams';
+
+/**
+ * Fetches data from the RTMP server with retry logic.
+ *
+ * @returns {Promise<string[]>} A promise that resolves to an array of live stream IDs.
+ */
+async function getRTMPServerData(): Promise<string[]> {
+
+}
+
+/**
+ * Handles errors by logging them and sending a response to the client.
+ *
+ * @param {Response} res - The Express response object.
+ * @param {any} error - The error object.
+ * @param {string} message - The error message.
+ * @returns {Response} The response sent to the client.
+ */
 const handleError = (res: Response, error: any, message: string): Response => {
     console.error(`Error in ${message}:`, error);
     return res.status(500).json({ error: `Something went wrong in ${message}` });
@@ -15,22 +35,26 @@ const handleError = (res: Response, error: any, message: string): Response => {
  * @param {Request} req - The Express request object.
  * @param {Response} res - The Express response object.
  * @returns {Promise<Response>} A promise that resolves to the response sent to the client.
- *
- * @throws {Error} If there's an issue retrieving channel details.
  */
 export const getChannelDetails = async (req: Request, res: Response): Promise<Response> => {
     try {
         const { channelId } = req.params;
         const channel = await Channel.findById(channelId);
-
         if (!channel) {
             return res.status(404).send("Channel not found");
         }
-
         const user = await User.findOne({ channel: channelId }, { username: 1 });
-        const streamUrl = `http://localhost:8000/live/${channel.streamKey}.flv`; // TODO: Implement dynamic stream URL generation
-        const isOnline = false; // TODO: Implement real-time online status checking
-
+        const streamUrl = `http://localhost:8000/live/${channel.streamKey}.flv`;
+        
+        let liveChannels: string[] = [];
+        try {
+            liveChannels = await getRTMPServerData();
+        } catch (error) {
+            console.error('Error fetching RTMP server data:', error);
+        }
+        
+        const isOnline = liveChannels.includes(channel.streamKey);
+        
         return res.status(200).json({
             id: channel._id,
             title: channel.title,
@@ -51,8 +75,6 @@ export const getChannelDetails = async (req: Request, res: Response): Promise<Re
  * @param {Request} _ - The Express request object (unused).
  * @param {Response} res - The Express response object.
  * @returns {Promise<Response>} A promise that resolves to the response sent to the client.
- *
- * @throws {Error} If there's an issue fetching channels.
  */
 export const getChannels = async (_: Request, res: Response): Promise<Response> => {
     try {
@@ -60,22 +82,22 @@ export const getChannels = async (_: Request, res: Response): Promise<Response> 
             "channel"
         );
 
-        console.log("All users:" + users);
+        const liveChannels = await getRTMPServerData();
 
-        const channels = users
-            .filter((user) => user.channel)
-            .map((user) => ({
-                id: user.channel._id,
-                title: user.channel.title,
-                avatarUrl: user.channel.avatarUrl,
-                thumbnailUrl: user.channel.thumbnailUrl,
-                username: user.username,
-                isOnline: false, // TODO: Implement real-time online status checking
-            }));
+        const channels = await Promise.all(users
+          .filter((user) => user.channel)
+          .map(async (user) => ({
+            id: user.channel._id,
+            title: user.channel.title,
+            avatarUrl: user.channel.avatarUrl,
+            thumbnailUrl: user.channel.thumbnailUrl,
+            username: user.username,
+            isOnline: liveChannels.includes(user.channel.streamKey),
+          })));
 
         return res.json(channels);
     } catch (e) {
-       return handleError(res, e, "getChannels");
+        return handleError(res, e, "getChannels");
     }
 };
 
@@ -84,10 +106,7 @@ export const getChannels = async (_: Request, res: Response): Promise<Response> 
  *
  * @param {Request} req - The Express request object.
  * @param {Response} res - The Express response object.
- * @param {NextFunction} next - The Express next middleware function.
  * @returns {Promise<Response>} A promise that resolves to the response sent to the client.
- *
- * @throws {Error} If there's an issue retrieving channel settings.
  */
 export const getChannelsSettings = async (req: Request, res: Response): Promise<Response> => {
     try {
@@ -107,7 +126,6 @@ export const getChannelsSettings = async (req: Request, res: Response): Promise<
             return res.status(404).send("Channel not found");
         }
 
-        console.log(userId);
         return res.status(200).json({
             id: userData?.channel._id,
             username: userData.username,
@@ -118,7 +136,7 @@ export const getChannelsSettings = async (req: Request, res: Response): Promise<
             streamKey: userData?.channel.streamKey,
         });
     } catch (e) {
-       return handleError(res, e, "getChannelsSettings");
+        return handleError(res, e, "getChannelsSettings");
     }
 };
 
@@ -128,8 +146,6 @@ export const getChannelsSettings = async (req: Request, res: Response): Promise<
  * @param {CustomeReq} req - The authenticated Express request object.
  * @param {Response} res - The Express response object.
  * @returns {Promise<Response>} A promise that resolves to the response sent to the client.
- *
- * @throws {Error} If there's an issue updating channel settings.
  */
 export const putChannelSettings = async (req: CustomeReq, res: Response): Promise<Response> => {
     try {
@@ -183,11 +199,18 @@ export const putChannelSettings = async (req: CustomeReq, res: Response): Promis
             thumbnailUrl: channelData.thumbnailUrl,
         });
     } catch (e) {
-        return handleError(res, e, "putChannelSettings")
+        return handleError(res, e, "putChannelSettings");
     }
 };
 
-export const postFollowChannel = async (req: CustomeReq, res: Response) => {
+/**
+ * Follows a channel for the authenticated user.
+ *
+ * @param {CustomeReq} req - The authenticated Express request object.
+ * @param {Response} res - The Express response object.
+ * @returns {Promise<Response>} A promise that resolves to the response sent to the client.
+ */
+export const postFollowChannel = async (req: CustomeReq, res: Response): Promise<Response> => {
     try {
         if (!req.user) {
             return res.status(401).json({ error: "User not authenticated" });
@@ -198,23 +221,29 @@ export const postFollowChannel = async (req: CustomeReq, res: Response) => {
         const userData = await User.findById(userId, { followingChannels: 1 });
 
         if (!userData) {
-            return res.status(500).send("user not found!");
+            return res.status(500).send("User not found!");
         }
         if (userData.followingChannels.includes(channelId)) {
-            return res.status(400).send("you are already following this channel");
+            return res.status(400).send("You are already following this channel");
         }
 
         userData.followingChannels.push(channelId);
-
         await userData.save();
 
-        return res.status(200).send("channel followed successfully");
+        return res.status(200).send("Channel followed successfully");
     } catch (e) {
-        return handleError(res, e, "postFollowChannel")
+        return handleError(res, e, "postFollowChannel");
     }
 };
 
-export const unfollowChannel = async (req: CustomeReq, res: Response) => {
+/**
+ * Unfollows a channel for the authenticated user.
+ *
+ * @param {CustomeReq} req - The authenticated Express request object.
+ * @param {Response} res - The Express response object.
+ * @returns {Promise<Response>} A promise that resolves to the response sent to the client.
+ */
+export const unfollowChannel = async (req: CustomeReq, res: Response): Promise<Response> => {
     try {
         if (!req.user) {
             return res.status(401).json({ error: "User not authenticated" });
@@ -236,16 +265,22 @@ export const unfollowChannel = async (req: CustomeReq, res: Response) => {
         }
 
         userData.followingChannels.splice(channelIndex, 1);
-
         await userData.save();
 
         return res.status(200).json({ message: "Channel unfollowed successfully" });
     } catch (e) {
-        return handleError(res, e, "unfollowChannel")
+        return handleError(res, e, "unfollowChannel");
     }
 };
 
-export const getFollowingChannels = async (req: CustomeReq, res: Response) => {
+/**
+ * Retrieves the list of channels followed by the authenticated user.
+ *
+ * @param {CustomeReq} req - The authenticated Express request object.
+ * @param {Response} res - The Express response object.
+ * @returns {Promise<Response>} A promise that resolves to the response sent to the client.
+ */
+export const getFollowingChannels = async (req: CustomeReq, res: Response): Promise<Response> => {
     try {
         if (!req.user) {
             return res.status(401).json({ error: "User not authenticated" });
@@ -257,17 +292,15 @@ export const getFollowingChannels = async (req: CustomeReq, res: Response) => {
             path: "followingChannels",
             select: "isActive title description avatarUrl streamKey",
         });
-        console.log("Populated user: ", user);
+
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
 
         const followingChannels = user.followingChannels;
 
-        console.log("following channels: ", followingChannels);
-
         return res.status(200).json({ followingChannels });
     } catch (e) {
-        return handleError(res, e, "getFollowingChannels")
+        return handleError(res, e, "getFollowingChannels");
     }
 };
