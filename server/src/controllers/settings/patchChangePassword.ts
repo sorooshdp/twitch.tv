@@ -25,7 +25,6 @@ export const patchChangePassword = async (req: AuthRequest, res: Response) => {
         }
 
         const isPasswordCorrect = await bcrypt.compare(password, userData.password);
-        console.log("Is password correct:", isPasswordCorrect);
 
         if (!isPasswordCorrect) {
             console.log("Invalid password attempt for user:", userId);

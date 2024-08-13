@@ -9,7 +9,6 @@ import { SignupRequestBody } from "../../types/auth.js";
 export const postSignup = async (req: Request<{}, {}, SignupRequestBody>, res: Response): Promise<Response> => {
     try {
         const { username, email, password } = req.body;
-        console.log("recieved info:" + email + "  " + password + "  " + username)
         const userExists = await User.exists({ email });
 
         if (userExists) {

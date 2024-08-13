@@ -31,5 +31,6 @@ interface ChannelData {
     title: string;
     avatarUrl: string;
     thumbnailUrl: string;
+    streamKey: string;
     isActive: boolean;
 }

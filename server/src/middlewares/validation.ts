@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { AuthRequest, LoginRequestBody, RegisterRequestBody } from "../types/auth";
+
 const config = process.env;
 
 const emailRegex = /\S+@\S+\.\S+/;
@@ -12,7 +13,6 @@ export const validateRegister = (
     next: NextFunction
 ): void => {
     const { username, email, password } = req.body;
-    console.log("info on validator: " + username + "   " + email + "  " + password);
 
     if (!username || typeof username !== "string") {
         console.log("err on username");
@@ -58,7 +58,6 @@ export const validateChannelId = (req: Request<{}, {}>, res: Response, next: Nex
 };
 
 export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction) => {
-    console.log("in verifyToken")
     let token = req.body.token || req.query.token || req.header("Authorization");
 
     if (!token) {

@@ -1,12 +1,14 @@
 import express from "express";
 import cors from "cors";
-import https from "https"
+import https from "https";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import authRoutes from "./routes/authRoutes.js";
 import channelsRoutes from "./routes/channelsRoutes.js";
 import settingsRoutes from "./routes/settingsRoutes.js";
 import fs from "fs";
+import { updateChannelsStatus } from "./services/channelService.js";
+import { registerSocketServer } from "./io/io.js";
 
 dotenv.config();
 
@@ -29,15 +31,18 @@ app.use("/api/channels", channelsRoutes);
 app.use("/api/settings", settingsRoutes);
 
 const httpsOptions = {
-    key: fs.readFileSync('../cert.key'),
-    cert: fs.readFileSync('../cert.crt')
+    key: fs.readFileSync('./cert.key'),
+    cert: fs.readFileSync('./cert.crt')
 };
 
 const server =  https.createServer(httpsOptions, app);
 
+registerSocketServer(server);
+
 mongoose
     .connect(process.env.MONGO_URL!)
     .then(() => {
+        updateChannelsStatus();
         server.listen(PORT, () => {
             console.log(`server is listening on ${PORT}`);
         });

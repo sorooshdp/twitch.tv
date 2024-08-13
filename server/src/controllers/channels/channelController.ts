@@ -1,20 +1,13 @@
 import { Request, Response } from "express";
 import User from "../../models/User.js";
+import http2 from "http2";
 import Channel from "../../models/Channel.js";
 import { ChannelData } from "../../types/models.js";
 import { CustomeReq } from "../../types/auth.js";
-import axios from "axios";
+import { isStreamLive } from "../../services/channelService.js";
 
-const RTMP_SERVER_URL = 'http://localhost:8000/api/streams';
 
-/**
- * Fetches data from the RTMP server with retry logic.
- *
- * @returns {Promise<string[]>} A promise that resolves to an array of live stream IDs.
- */
-async function getRTMPServerData(): Promise<string[]> {
-
-}
+const STREAM_URL_BASE = "http://localhost:8000/live/";
 
 /**
  * Handles errors by logging them and sending a response to the client.
@@ -39,33 +32,33 @@ const handleError = (res: Response, error: any, message: string): Response => {
 export const getChannelDetails = async (req: Request, res: Response): Promise<Response> => {
     try {
         const { channelId } = req.params;
+
+        if (!channelId) {
+            return res.status(400).json({ error: "Channel ID is required" });
+        }
+
         const channel = await Channel.findById(channelId);
         if (!channel) {
-            return res.status(404).send("Channel not found");
+            return res.status(404).json({ error: "Channel not found" });
         }
+
         const user = await User.findOne({ channel: channelId }, { username: 1 });
-        const streamUrl = `http://localhost:8000/live/${channel.streamKey}.flv`;
-        
-        let liveChannels: string[] = [];
-        try {
-            liveChannels = await getRTMPServerData();
-        } catch (error) {
-            console.error('Error fetching RTMP server data:', error);
+        if (!user) {
+            return res.status(404).json({ error: "User associated with this channel not found" });
         }
-        
-        const isOnline = liveChannels.includes(channel.streamKey);
-        
+
         return res.status(200).json({
             id: channel._id,
             title: channel.title,
             avatarUrl: channel.avatarUrl,
             description: channel.description,
-            username: user?.username,
-            isOnline,
-            streamUrl,
+            username: user.username,
+            isOnline: await isStreamLive(channel.streamKey), 
+            streamUrl: `${STREAM_URL_BASE}${channel.streamKey}.flv`,
         });
-    } catch (e) {
-        return handleError(res, e, "getChannelDetails");
+    } catch (error) {
+        console.error("Error in getChannelDetails:", error);
+        return res.status(500).json({ error: "An unexpected error occurred while fetching channel details" });
     }
 };
 
@@ -82,18 +75,18 @@ export const getChannels = async (_: Request, res: Response): Promise<Response> 
             "channel"
         );
 
-        const liveChannels = await getRTMPServerData();
-
-        const channels = await Promise.all(users
-          .filter((user) => user.channel)
-          .map(async (user) => ({
-            id: user.channel._id,
-            title: user.channel.title,
-            avatarUrl: user.channel.avatarUrl,
-            thumbnailUrl: user.channel.thumbnailUrl,
-            username: user.username,
-            isOnline: liveChannels.includes(user.channel.streamKey),
-          })));
+        const channels = await Promise.all(
+            users
+                .filter((user) => user.channel)
+                .map(async (user) => ({
+                    id: user.channel._id,
+                    title: user.channel.title,
+                    avatarUrl: user.channel.avatarUrl,
+                    thumbnailUrl: user.channel.thumbnailUrl,
+                    username: user.username,
+                    isOnline: await isStreamLive(user.channel.streamKey),
+                }))
+        );
 
         return res.json(channels);
     } catch (e) {
