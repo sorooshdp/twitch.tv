@@ -1,4 +1,4 @@
-import React , {ReactNode} from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import App from "./App";
 import Login from "./components/Login";
@@ -10,24 +10,51 @@ import Channels from "./components/Channels";
 import Channel from "./components/Channel";
 import Settings from "./components/Settings";
 
-const isAuthenticated = () => {
-    return localStorage.getItem("TOKEN") !== null;
+const useAuth = () => {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    useEffect(() => {
+        const checkAuth = () => {
+            const token = localStorage.getItem("TOKEN");
+            setIsAuthenticated(token !== null);
+        };
+
+        checkAuth();
+        window.addEventListener("storage", checkAuth);
+
+        return () => {
+            window.removeEventListener("storage", checkAuth);
+        };
+    }, []);
+
+    return isAuthenticated;
 };
 
 const PrivateRoute: React.FC<{ children: ReactNode }> = ({ children }) => {
+    const isAuthenticated = useAuth();
     const location = useLocation();
-    return isAuthenticated() ? <>{children}</> : <Navigate to="/login" state={{ from: location }} />;
+
+    if (!isAuthenticated) {
+        return <Navigate to="/login" state={{ from: location }} replace />;
+    }
+
+    return <>{children}</>;
 };
 
 export const Root = () => {
+    const isAuthenticated = useAuth();
+
     return (
         <Router>
             <Routes>
                 <Route path="/" element={<App />} />
-                <Route path="/login" element={isAuthenticated() ? <Navigate to="/dashboard/channels" /> : <Login />} />
+                <Route
+                    path="/login"
+                    element={isAuthenticated ? <Navigate to="/dashboard/channels" replace /> : <Login />}
+                />
                 <Route
                     path="/signup"
-                    element={isAuthenticated() ? <Navigate to="/dashboard/channels" /> : <Signup />}
+                    element={isAuthenticated ? <Navigate to="/dashboard/channels" replace /> : <Signup />}
                 />
                 <Route
                     path="/dashboard/*"
@@ -42,7 +69,7 @@ export const Root = () => {
                             </Dashboard>
                         </PrivateRoute>
                     }
-                ></Route>
+                />
             </Routes>
         </Router>
     );

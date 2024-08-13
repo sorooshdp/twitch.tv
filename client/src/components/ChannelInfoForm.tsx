@@ -5,7 +5,7 @@ interface FormData {
     title: string;
     description: string;
     avatarUrl: string;
-thumbnailUrl: string; 
+    thumbnailUrl: string;
 }
 
 interface ChannelInfoFormProps {
