@@ -9,6 +9,9 @@ import settingsRoutes from "./routes/settingsRoutes.js";
 import fs from "fs";
 import { updateChannelsStatus } from "./services/channelService.js";
 import { registerSocketServer } from "./io/io.js";
+import User from "./models/User.js";
+import Channel from "./models/Channel.js";
+import Message from "./models/Message.js";
 
 dotenv.config();
 

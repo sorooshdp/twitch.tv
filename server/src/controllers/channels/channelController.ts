@@ -1,11 +1,9 @@
 import { Request, Response } from "express";
 import User from "../../models/User.js";
-import http2 from "http2";
 import Channel from "../../models/Channel.js";
 import { ChannelData } from "../../types/models.js";
 import { CustomeReq } from "../../types/auth.js";
 import { isStreamLive } from "../../services/channelService.js";
-
 
 const STREAM_URL_BASE = "http://localhost:8000/live/";
 

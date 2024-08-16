@@ -7,6 +7,12 @@ export interface User {
     userId?: string;
 }
 
+interface IMessage extends Document {
+    author: string;
+    content: string;
+    date: Date;
+}
+
 export interface IUser extends Document {
     username: string;
     email: string;
@@ -15,15 +21,14 @@ export interface IUser extends Document {
     followingChannels: mongoose.Types.ObjectId[];
 }
 
-export interface IChannel extends Document {
-    _id: string;
+interface IChannel extends Document {
     isActive: boolean;
     title: string;
     description: string;
     avatarUrl: string;
     thumbnailUrl: string;
     streamKey: string;
-    messages: mongoose.Types.ObjectId[];
+    messages: IMessage[];
 }
 
 interface ChannelData {
