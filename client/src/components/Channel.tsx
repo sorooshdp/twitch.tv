@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import CustomFlvPlayer from "./CustomFlvPlayer";
+import { useChatSocket } from "../ts/hooks/useChat";
 
 interface ChannelDetails {
     id: string;
@@ -102,6 +103,7 @@ const ChatPanel: React.FC<{
 
 const SingleChannelPage: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen }) => {
     const { id } = useParams<{ id: string }>();
+    const { messages, sendMessage } = useChatSocket("https://localhost:5173/");
     const [channelDetails, setChannelDetails] = useState<ChannelDetails | null>(null);
     const [isFollowing, setIsFollowing] = useState(false);
     const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
@@ -112,19 +114,19 @@ const SingleChannelPage: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen }) 
 
     useEffect(() => {
         const fetchChannelDetails = async () => {
-          try {
-            if (!id) {
-              console.error("Channel ID is undefined");
-              return;
+            try {
+                if (!id) {
+                    console.error("Channel ID is undefined");
+                    return;
+                }
+                const response = await axios.get<ChannelDetails>(`https://localhost:5514/api/channels/${id}`);
+                setChannelDetails(response.data);
+            } catch (error) {
+                console.error("Error fetching channel details:", error);
             }
-            const response = await axios.get<ChannelDetails>(`https://localhost:5514/api/channels/${id}`);
-            setChannelDetails(response.data);
-          } catch (error) {
-            console.error("Error fetching channel details:", error);
-          }
         };
         fetchChannelDetails();
-      }, [id]);
+    }, [id]);
 
     const handleFollowToggle = async () => {
         try {
@@ -173,7 +175,11 @@ const SingleChannelPage: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen }) 
                 }`}
             >
                 <div className={`flex-1 ${sidebarOpen ? "w-[calc(100%-320px)]" : "w-full"}`}>
-                    <VideoPlayer streamUrl={channelDetails.streamUrl} isOnline={channelDetails.isOnline} channelName={channelDetails.title} />
+                    <VideoPlayer
+                        streamUrl={channelDetails.streamUrl}
+                        isOnline={channelDetails.isOnline}
+                        channelName={channelDetails.title}
+                    />
                     <ChannelInfo
                         channelDetails={channelDetails}
                         isFollowing={isFollowing}
