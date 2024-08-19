@@ -1,9 +1,3 @@
-export type FormInfo = {
-    username: string;
-    email: string;
-    password: string;
-};
-
 export const isEmail = (value: string): boolean => /\S+@\S+\.\S+/.test(value) || value === "";
 
 export const isAlphanumeric = (value: string): boolean => /^[a-zA-Z0-9]+$/.test(value);

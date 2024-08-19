@@ -1,10 +1,5 @@
 import React from "react";
-
-interface PasswordData {
-    currentPassword: string;
-    newPassword: string;
-    confirmNewPassword: string;
-}
+import { PasswordData } from "../ts/types/Auth";
 
 interface PasswordChangeFormProps {
     passwordData: PasswordData;

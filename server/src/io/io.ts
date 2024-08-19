@@ -4,6 +4,12 @@ import Message from '../models/Message.js';
 import Channel from '../models/Channel.js';
 import User from '../models/User.js';
 
+/**
+ * Registers the socket server and sets up event listeners.
+ * 
+ * @param {HttpServer} server - The HTTP server instance.
+ * @returns {void}
+ */
 export const registerSocketServer = (server: HttpServer): void => {
   const io = new Server(server, {
     cors: {
@@ -19,11 +25,10 @@ export const registerSocketServer = (server: HttpServer): void => {
       socket.join(channelId);
       console.log(`Client ${socket.id} joined channel ${channelId}`);
 
-      // Fetch and send chat history
       try {
         const channel = await Channel.findById(channelId).populate('messages').exec();
         if (channel) {
-          const messages = channel.messages.slice(-100); // Get last 100 messages
+          const messages = channel.messages.slice(-100); 
           socket.emit('chat-history', { channelId, messages });
         }
       } catch (error) {

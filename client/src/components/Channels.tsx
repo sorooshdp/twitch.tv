@@ -1,23 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { ChannelProps } from "../ts/types/Channel";
 
-interface ChannelProps {
-    id: string;
-    title: string;
-    avatarUrl: string;
-    thumbnailUrl: string;
-    username: string;
-    isOnline: boolean;
-    viewers?: number;
-}
-
-const ChannelCard: React.FC<ChannelProps> = ({ id, title, viewers, avatarUrl, thumbnailUrl, username, isOnline }) => (
+const ChannelCard: React.FC<ChannelProps> = ({ id, title, viewers, avatarUrl, thumbnailUrl, username, isActive }) => (
     <Link to={`${id}`} className="block">
         <div className="bg-secondary/10 rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-105">
             <div className="relative aspect-video">
                 <img src={thumbnailUrl} alt={`${title}'s stream`} className="w-full h-full object-cover" />
-                {isOnline && (
+                {isActive && (
                     <div className="absolute bottom-2 left-2 bg-red-600 text-white text-sm px-2 py-1 rounded">LIVE</div>
                 )}
                 {viewers !== undefined && (

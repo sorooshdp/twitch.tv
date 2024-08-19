@@ -1,13 +1,5 @@
 import React from "react";
-
-interface FormData {
-    username: string;
-    title: string;
-    description: string;
-    avatarUrl: string;
-    thumbnailUrl: string;
-}
-
+import { ChannelProps as FormData } from "../ts/types/Channel";
 interface ChannelInfoFormProps {
     formData: FormData;
     handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;

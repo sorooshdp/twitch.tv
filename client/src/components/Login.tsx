@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Input from "./Input";
-import { FormInfo, isEmail } from "../ts/utils/Validation";
+import { isEmail } from "../ts/utils/Validation";
 import { useAuth } from "../ts/hooks/useAuth";
+import { AuthData as FormInfo } from "../ts/types/Auth";
 
 const Login: React.FC = () => {
     const { login, isLoading } = useAuth();

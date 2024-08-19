@@ -4,20 +4,8 @@ import { isPassword } from "../ts/utils/Validation";
 import { ChannelInfoForm } from "./ChannelInfoForm";
 import { PasswordChangeForm } from "./PasswordChangeForm";
 import { StreamSettings } from "./StreamSettings";
-
-interface FormData {
-    username: string;
-    title: string;
-    description: string;
-    avatarUrl: string;
-    thumbnailUrl: string;
-}
-
-interface PasswordData {
-    currentPassword: string;
-    newPassword: string;
-    confirmNewPassword: string;
-}
+import { ChannelProps as FormData } from "../ts/types/Channel";
+import { PasswordData  } from "../ts/types/Auth";
 
 const SettingsPage: React.FC = () => {
     const { channelInfo, isLoading, error, updateChannelInfo, changePassword } = useSettings();

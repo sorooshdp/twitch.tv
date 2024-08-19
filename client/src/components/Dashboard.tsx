@@ -1,15 +1,7 @@
 import React, { ReactNode, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { ChannelProps as Channel } from "../ts/types/Channel";
 import axios from "axios";
-
-interface Channel {
-    _id: string;
-    isActive: boolean;
-    title: string;
-    description: string;
-    avatarUrl: string;
-    streamKey: string;
-}
 
 const Logo = ({ size = 40 }) => (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 100 100">
@@ -129,7 +121,7 @@ const Dashboard: React.FC<{ children?: ReactNode }> = ({ children }) => {
                         ) : (
                             channels.map((channel) => (
                                 <div
-                                    key={channel._id}
+                                    key={channel.id}
                                     className={`${
                                         sidebarCollapsed ? "w-[70px]" : ""
                                     } flex items-center mb-4 p-2 rounded-lg hover:bg-white/20 transition-all`}

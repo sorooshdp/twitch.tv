@@ -1,23 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-
-interface ChannelInfo {
-    id: string;
-    username: string;
-    title: string;
-    description: string;
-    avatarUrl: string;
-    streamKey: string;
-    thumbnailUrl : string;
-}
-
-interface UpdateChannelInfoParams {
-    username: string;
-    title: string;
-    description: string;
-    avatarUrl: string;
-    thumbnailUrl: string;
-}
+import { ChannelProps as ChannelInfo } from "../types/Channel";
 
 export const useSettings = () => {
     const [channelInfo, setChannelInfo] = useState<ChannelInfo | null>(null);
@@ -51,7 +34,7 @@ export const useSettings = () => {
         fetchChannelInfo();
     }, [fetchChannelInfo]);
 
-    const updateChannelInfo = useCallback(async (updatedInfo: UpdateChannelInfoParams) => {
+    const updateChannelInfo = useCallback(async (updatedInfo: ChannelInfo) => {
         setIsLoading(true);
         setError(null);
         try {
