@@ -1,5 +1,3 @@
-// src/services/channelService.ts
-
 import http2 from "http2";
 import Channel from "../models/Channel.js";
 

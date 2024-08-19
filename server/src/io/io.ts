@@ -1,47 +1,69 @@
-import Channel from "../models/Channel";
-import { Server, Socket } from "socket.io";
-import { Server as HttpServer } from "http";
-import { IMessage } from "../types/models";
+import { Server as HttpServer } from 'http';
+import { Server, Socket } from 'socket.io';
+import Message from '../models/Message.js';
+import Channel from '../models/Channel.js';
+import User from '../models/User.js';
 
 export const registerSocketServer = (server: HttpServer): void => {
-    const io = new Server(server, {
-        cors: {
-            origin: "*",
-            methods: ["GET", "POST"],
-        },
-    });
+  const io = new Server(server, {
+    cors: {
+      origin: 'https://localhost:5173',
+      methods: ['GET', 'POST'],
+    },
+  });
 
-    io.on("connection", (socket: Socket) => {
-        console.log("new server connected");
-        console.log(socket.id);
+  io.on('connection', (socket: Socket) => {
+    console.log('New client connected:', socket.id);
 
-        socket.on("chat-history", (channelId: string) => {
-            emitChatHistory(socket, channelId);
-        });
-    });
-};
+    socket.on('join-channel', async (channelId: string) => {
+      socket.join(channelId);
+      console.log(`Client ${socket.id} joined channel ${channelId}`);
 
-const emitChatHistory = async (socket: Socket, channelId: string): Promise<void> => {
-    try {
-        const channel = await Channel.findById(channelId).populate("messages");
+      // Fetch and send chat history
+      try {
+        const channel = await Channel.findById(channelId).populate('messages').exec();
         if (channel) {
-            socket.emit("chat-history", {
-                channelId,
-                messages: channel.messages.map((m: IMessage) => ({
-                    author: m.author,
-                    content: m.content,
-                    date: m.date,
-                })),
-            });
+          const messages = channel.messages.slice(-100); // Get last 100 messages
+          socket.emit('chat-history', { channelId, messages });
         }
+      } catch (error) {
+        console.error('Error fetching chat history:', error);
+      }
+    });
 
-        socket.emit("chat-history", {
-            errorOccurred: true,
+    socket.on('leave-channel', (channelId: string) => {
+      socket.leave(channelId);
+      console.log(`Client ${socket.id} left channel ${channelId}`);
+    });
+
+    socket.on('chat-message', async (data: { channelId: string, message: { author: string, content: string, date: string } }) => {
+      console.log("Message received on server:", data.message.content);
+      try {
+        // Store the message in the database
+        const newMessage = new Message({
+          channelId: data.channelId,
+          author: data.message.author,
+          content: data.message.content,
+          date: new Date(data.message.date)
         });
-    } catch (e) {
-        console.error("Error emitting chat history:", e);
-        socket.emit("chat-history", {
-            errorOccurred: true,
-        });
-    }
+        await newMessage.save();
+
+        // Add the message to the channel's messages array
+        await Channel.findByIdAndUpdate(
+          data.channelId,
+          { $push: { messages: newMessage._id } },
+          { new: true }
+        );
+
+        // Broadcast the message to all clients in the channel
+        io.to(data.channelId).emit('new-message', newMessage);
+      } catch (error) {
+        console.error('Error saving message to database:', error);
+      }
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Client disconnected:', socket.id);
+    });
+  });
 };

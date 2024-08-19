@@ -22,6 +22,7 @@ export interface IUser extends Document {
 }
 
 interface IChannel extends Document {
+    _id: string;
     isActive: boolean;
     title: string;
     description: string;

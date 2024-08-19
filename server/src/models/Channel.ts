@@ -10,7 +10,7 @@ const channelSchema = new Schema<IChannel>({
     thumbnailUrl: { type: String, default: "none" }, // New property for thumbnail URL
     streamKey: { type: String, default: uuid() },
     messages: {
-        type: [{ type: Schema.Types.ObjectId, ref: "message" }],
+        type: [{ type: Schema.Types.ObjectId, ref: "Message" }],
         default: [],
     },
 });
