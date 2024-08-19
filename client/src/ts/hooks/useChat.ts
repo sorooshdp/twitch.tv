@@ -1,60 +1,58 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 
-interface ChatMessage {
-  author: string;
-  content: string;
-  date: Date;
+interface Message {
+    author: string;
+    content: string;
+    date: string;
 }
 
-export const useChatSocket = (url: string) => {
-  const [socket, setSocket] = useState<Socket | null>(null);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [channelId, setChannelId] = useState<string | null>(null);
+export const useChatSocket = (channelId: string) => {
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [socket, setSocket] = useState<Socket | null>(null);
 
-  useEffect(() => {
-    const socketIo = io(url);
+    useEffect(() => {
+        // Initialize the socket connection
+        const IO = io("https://localhost:5514", {
+            withCredentials: true,
+            transports: ["websocket"],
+        });
 
-    socketIo.on("connect", () => {
-      console.log("Connected to chat server");
-    });
+        // Set the socket instance in state
+        setSocket(IO);
 
-    socketIo.on("message", (message: ChatMessage) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
-    });
+        // Join the channel
+        IO.emit("join-channel", channelId);
 
-    socketIo.on("chat-history", (data: { channelId: string; messages: ChatMessage[] }) => {
-      if (data.channelId === channelId) {
-        setMessages(data.messages);
-      }
-    });
+        // Handle incoming chat history
+        IO.on("chat-history", (data: { channelId: string; messages: Message[] }) => {
+            setMessages(data.messages);
+        });
 
-    setSocket(socketIo);
+        // Handle incoming new messages
+        IO.on("new-message", (message: Message) => {
+            console.log("message recieved on client: " + message);
+            setMessages((prevMessages) => [...prevMessages, message]);
+        });
 
-    return () => {
-      socketIo.disconnect();
+        // Cleanup on component unmount or channel change
+        return () => {
+            IO.emit("leave-channel", channelId);
+            IO.disconnect();
+        };
+    }, [channelId]);
+
+    // Function to send a new message
+    const sendMessage = (content: string, author: string) => {
+        if (socket) {
+            const message: Message = {
+                author,
+                content,
+                date: new Date().toISOString(),
+            };
+            socket.emit("chat-message", { channelId, message });
+        }
     };
-  }, [url]);
 
-  const sendMessage = useCallback((message: string) => {
-    if (socket && channelId) {
-      socket.emit("message", { channelId, message });
-    }
-  }, [socket, channelId]);
-
-  const getChatHistory = useCallback(() => {
-    if (socket && channelId) {
-      socket.emit("chat-history", channelId);
-    }
-  }, [socket, channelId]);
-
-  const setChannel = useCallback((newChannelId: string) => {
-    setChannelId(newChannelId);
-    setMessages([]); // Clear messages when changing channels
-    if (socket) {
-      socket.emit("chat-history", newChannelId);
-    }
-  }, [socket]);
-
-  return { messages, sendMessage, getChatHistory, setChannel };
+    return { messages, sendMessage };
 };
