@@ -3,21 +3,20 @@ import { useNavigate } from "react-router-dom";
 import { ChannelProps as Channel } from "../ts/types/Channel";
 import axios from "axios";
 
-const Logo = ({ size = 40 }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 100 100">
-        <rect x="10" y="20" width="80" height="60" rx="10" fill="#9146FF" />
-        <path d="M30 40 L30 60 L50 60 L50 40 Z" fill="#F0F0FF" />
-        <path d="M70 40 L70 60 L50 60 L50 40 Z" fill="#F0F0FF" />
-        <circle cx="40" cy="50" r="5" fill="#9146FF" />
-        <circle cx="60" cy="50" r="5" fill="#9146FF" />
-    </svg>
-);
+export const Logo = () => {
+    return (
+        <div className="font-['Orbitron'] text-4xl font-bold text-white tracking-wide relative">
+            <span className="relative">twitch</span>
+            <span className="text-purple-600 italic">.tv</span>
+        </div>
+    );
+};
 
-const Dashboard: React.FC<{ children?: ReactNode }> = ({ children }) => {
-    const [channels, setChannels] = useState<Channel[]>([]);
+const Dashboard: React.FC<{ children?: ReactNode; liveChannels: object }> = ({ children, liveChannels }) => {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [channels, setChannels] = useState<Channel[]>([]);
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -27,7 +26,7 @@ const Dashboard: React.FC<{ children?: ReactNode }> = ({ children }) => {
                     "https://localhost:5514/api/channels/following",
                     {
                         headers: {
-                            Authorization: `Bearer ${JSON.parse(localStorage.getItem("TOKEN")!)}`,
+                            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("TOKEN")!)}`,
                         },
                     }
                 );
@@ -35,6 +34,7 @@ const Dashboard: React.FC<{ children?: ReactNode }> = ({ children }) => {
                     if (a.isActive === b.isActive) return 0;
                     return a.isActive ? -1 : 1;
                 });
+
                 setChannels(sortedChannels);
                 setLoading(false);
             } catch (err) {
@@ -52,8 +52,8 @@ const Dashboard: React.FC<{ children?: ReactNode }> = ({ children }) => {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem("TOKEN");
-        localStorage.removeItem("USERNAME");
+        sessionStorage.removeItem("TOKEN");
+        sessionStorage.removeItem("USERNAME");
         navigate("/");
     };
 
@@ -66,7 +66,7 @@ const Dashboard: React.FC<{ children?: ReactNode }> = ({ children }) => {
                         onClick={() => navigate("/dashboard/channels")}
                         className="mr-4 hover:opacity-80 transition-opacity"
                     >
-                        <Logo size={40} />
+                        <Logo />
                     </button>
                 </div>
                 <div className="flex-1 flex justify-center">
@@ -148,7 +148,9 @@ const Dashboard: React.FC<{ children?: ReactNode }> = ({ children }) => {
                                                     channel.isActive ? "text-green-400" : "text-muted"
                                                 }`}
                                             >
-                                                {channel.isActive ? "● Online" : "○ Offline"}
+                                                {Object.keys(liveChannels ?? {}).includes(channel.streamKey!)
+                                                    ? "● Online"
+                                                    : "○ Offline"}
                                             </p>
                                         </div>
                                     )}

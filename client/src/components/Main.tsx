@@ -1,6 +1,7 @@
 import { useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { Logo } from "./Dashboard";
 
 export default function Main() {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -27,7 +28,7 @@ export default function Main() {
         <div ref={containerRef} className="gradient-container min-h-screen flex flex-col overflow-hidden relative">
             <nav className="w-full bg-gray-800 p-4 z-20">
                 <div className="container mx-auto flex justify-between items-center">
-                    <div className="text-white text-xl font-bold">Twitch.tv</div>
+                    <Logo />
                     <div className="flex space-x-4">
                         <Link to="login">
                             <button className="bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded">
@@ -50,7 +51,7 @@ export default function Main() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8 }}
                 >
-                    Welcome to Twitch.tv!
+                    Welcome to <span className="font-['Orbitron']">twitch.tv</span>
                 </motion.h1>
                 <motion.div
                     whileHover={{ scale: 1.05 }}

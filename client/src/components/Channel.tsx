@@ -10,7 +10,7 @@ const VideoPlayer: React.FC<{
     isOnline: boolean;
     channelName?: string;
 }> = ({ streamUrl, isOnline, channelName = "This channel" }) => (
-    <div className="w-full h-full bg-black aspect-video flex items-center justify-center">
+    <div className="w-full bg-black aspect-video flex items-center justify-center">
         {isOnline ? (
             <CustomFlvPlayer streamUrl={streamUrl} />
         ) : (
@@ -69,7 +69,7 @@ export const ChatPanel: React.FC<{ channelId: string; currentUser: string }> = (
     };
 
     return (
-        <div className="w-80 bg-secondary/10 flex flex-col">
+        <div className="w-[22rem] bg-secondary/10 flex flex-col">
             <div className="flex-1 overflow-y-auto p-4">
                 {messages.map((msg) => (
                     <div key={Math.random()} className="mb-2">
@@ -98,11 +98,14 @@ export const ChatPanel: React.FC<{ channelId: string; currentUser: string }> = (
     );
 };
 
-export const SingleChannelPage: React.FC<{ sidebarOpen: boolean }> = ({ sidebarOpen }) => {
+export const SingleChannelPage: React.FC<{ sidebarOpen: boolean; liveChannels: object }> = ({
+    sidebarOpen,
+    liveChannels,
+}) => {
     const { id } = useParams<{ id: string }>();
     const [channelDetails, setChannelDetails] = useState<ChannelDetails | null>(null);
     const [isFollowing, setIsFollowing] = useState(false);
-    const [currentUser, setCurrentUser] = useState<string>(localStorage.getItem("USERNAME")!); // Add this line
+    const [currentUser, setCurrentUser] = useState<string>(sessionStorage.getItem("USERNAME")!);
 
     useEffect(() => {
         const fetchChannelDetails = async () => {
@@ -120,10 +123,7 @@ export const SingleChannelPage: React.FC<{ sidebarOpen: boolean }> = ({ sidebarO
 
         const fetchCurrentUser = async () => {
             try {
-                const response = await axios.get("https://localhost:5514/api/auth/current-user", {
-                    withCredentials: true,
-                });
-                setCurrentUser(response.data.username || response.data.email);
+                setCurrentUser(sessionStorage.getItem("USERNAME")!);
             } catch (error) {
                 console.error("Error fetching current user:", error);
             }
@@ -162,17 +162,16 @@ export const SingleChannelPage: React.FC<{ sidebarOpen: boolean }> = ({ sidebarO
         return <div className="text-center p-4">Loading channel details...</div>;
     }
 
+    console.log(Object.keys(liveChannels ?? {}));
+    console.log(channelDetails)
+
     return (
         <div className="flex h-full bg-dark text-white">
-            <div
-                className={`flex-1 flex flex-col overflow-y-scroll transition-all duration-300 ${
-                    sidebarOpen ? "mr-4" : ""
-                }`}
-            >
+            <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarOpen ? "mr-4" : ""}`}>
                 <div className={`flex-1 ${sidebarOpen ? "w-[calc(100%-320px)]" : "w-full"}`}>
                     <VideoPlayer
                         streamUrl={channelDetails.streamUrl!}
-                        isOnline={channelDetails.isActive!}
+                        isOnline={Object.keys(liveChannels ?? {}).includes(channelDetails.streamKey!)}
                         channelName={channelDetails.title}
                     />
                     <ChannelInfo

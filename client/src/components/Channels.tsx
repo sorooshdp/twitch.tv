@@ -42,7 +42,6 @@ const Channels: React.FC = () => {
             try {
                 const response = await axios.get<ChannelProps[]>("https://localhost:5514/api/channels");
                 setChannels(response.data);
-                console.log(response.data);
                 setLoading(false);
             } catch (err) {
                 console.error("Error fetching channels:", err);

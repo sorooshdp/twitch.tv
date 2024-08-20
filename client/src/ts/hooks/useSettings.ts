@@ -14,7 +14,7 @@ export const useSettings = () => {
             const response = await axios.get("https://localhost:5514/api/settings/channel", {
                 withCredentials: true,
                 headers: {
-                    Authorization: `Bearer ${JSON.parse(localStorage.getItem("TOKEN")!)}`,
+                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("TOKEN")!)}`,
                 },
             });
             setChannelInfo(response.data);
@@ -44,7 +44,7 @@ export const useSettings = () => {
                 {
                     withCredentials: true,
                     headers: {
-                        Authorization: `Bearer ${JSON.parse(localStorage.getItem("TOKEN")!)}`,
+                        Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("TOKEN")!)}`,
                     },
                 }
             );
@@ -73,7 +73,7 @@ export const useSettings = () => {
                 {
                     withCredentials: true,
                     headers: {
-                        Authorization: `Bearer ${JSON.parse(localStorage.getItem("TOKEN")!)}`,
+                        Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("TOKEN")!)}`,
                     },
                 }
             );
