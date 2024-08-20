@@ -3,7 +3,6 @@ import User from "../../models/User.js";
 import Channel from "../../models/Channel.js";
 import { ChannelData } from "../../types/models.js";
 import { CustomeReq } from "../../types/auth.js";
-import { isStreamLive } from "../../services/channelService.js";
 
 const STREAM_URL_BASE = "http://localhost:8000/live/";
 
@@ -51,7 +50,8 @@ export const getChannelDetails = async (req: Request, res: Response): Promise<Re
             avatarUrl: channel.avatarUrl,
             description: channel.description,
             username: user.username,
-            isOnline: await isStreamLive(channel.streamKey), 
+            isOnline: false, 
+            streamKey: channel.streamKey,
             streamUrl: `${STREAM_URL_BASE}${channel.streamKey}.flv`,
         });
     } catch (error) {
@@ -82,7 +82,7 @@ export const getChannels = async (_: Request, res: Response): Promise<Response> 
                     avatarUrl: user.channel.avatarUrl,
                     thumbnailUrl: user.channel.thumbnailUrl,
                     username: user.username,
-                    isOnline: await isStreamLive(user.channel.streamKey),
+                    isOnline: false,
                 }))
         );
 

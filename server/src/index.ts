@@ -7,7 +7,6 @@ import authRoutes from "./routes/authRoutes.js";
 import channelsRoutes from "./routes/channelsRoutes.js";
 import settingsRoutes from "./routes/settingsRoutes.js";
 import fs from "fs";
-import { updateChannelsStatus } from "./services/channelService.js";
 import { registerSocketServer } from "./io/io.js";
 import User from "./models/User.js";
 import Channel from "./models/Channel.js";
@@ -45,7 +44,6 @@ registerSocketServer(server);
 mongoose
     .connect(process.env.MONGO_URL!)
     .then(() => {
-        updateChannelsStatus();
         server.listen(PORT, () => {
             console.log(`server is listening on ${PORT}`);
         });
