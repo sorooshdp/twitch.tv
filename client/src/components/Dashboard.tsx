@@ -1,5 +1,5 @@
 import React, { ReactNode, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ChannelProps as Channel } from "../ts/types/Channel";
 import axios from "axios";
 
@@ -56,6 +56,8 @@ const Dashboard: React.FC<{ children?: ReactNode; liveChannels: object }> = ({ c
         sessionStorage.removeItem("USERNAME");
         navigate("/");
     };
+
+    console.log(channels)
 
     return (
         <div className="flex flex-col h-screen bg-dark text-white">
@@ -120,41 +122,43 @@ const Dashboard: React.FC<{ children?: ReactNode; liveChannels: object }> = ({ c
                             <p>No channels followed</p>
                         ) : (
                             channels.map((channel) => (
-                                <div
-                                    key={channel.id}
-                                    className={`${
-                                        sidebarCollapsed ? "w-[70px]" : ""
-                                    } flex items-center mb-4 p-2 rounded-lg hover:bg-white/20 transition-all`}
-                                >
+                                <Link to={`/dashboard/channels/${channel._id}`}>
                                     <div
-                                        className={`w-12 h-12 bg-gray-300 rounded-full overflow-hidden flex-shrink-0 ${
-                                            channel.isActive ? "" : "filter grayscale"
-                                        }`}
+                                        key={Math.random()}
+                                        className={`${
+                                            sidebarCollapsed ? "w-[64px] ml-[-0.5rem]" : ""
+                                        } flex items-center mb-4 p-2 rounded-lg hover:bg-white/20 transition-all`}
                                     >
-                                        <img
-                                            src={
-                                                channel.avatarUrl ||
-                                                `https://i1.sndcdn.com/artworks-JTqQfDWAELB8wFof-x4ZTqA-t500x500.jpg`
-                                            }
-                                            alt={channel.title}
-                                            className="w-full h-full object-cover"
-                                        />
-                                    </div>
-                                    {!sidebarCollapsed && (
-                                        <div className="ml-3 overflow-hidden">
-                                            <p className="font-semibold truncate">{channel.title}</p>
-                                            <p
-                                                className={`text-sm ${
-                                                    channel.isActive ? "text-green-400" : "text-muted"
-                                                }`}
-                                            >
-                                                {Object.keys(liveChannels ?? {}).includes(channel.streamKey!)
-                                                    ? "● Online"
-                                                    : "○ Offline"}
-                                            </p>
+                                        <div
+                                            className={`w-12 h-12 bg-gray-300 rounded-full overflow-hidden flex-shrink-0 ${
+                                                channel.isActive ? "" : "filter grayscale"
+                                            }`}
+                                        >
+                                            <img
+                                                src={
+                                                    channel.avatarUrl ||
+                                                    `https://i1.sndcdn.com/artworks-JTqQfDWAELB8wFof-x4ZTqA-t500x500.jpg`
+                                                }
+                                                alt={channel.title}
+                                                className="w-full h-full object-cover"
+                                            />
                                         </div>
-                                    )}
-                                </div>
+                                        {!sidebarCollapsed && (
+                                            <div className="ml-3 overflow-hidden">
+                                                <p className="font-semibold truncate">{channel.title}</p>
+                                                <p
+                                                    className={`text-sm ${
+                                                        channel.isActive ? "text-green-400" : "text-muted"
+                                                    }`}
+                                                >
+                                                    {Object.keys(liveChannels ?? {}).includes(channel.streamKey!)
+                                                        ? "● Online"
+                                                        : "○ Offline"}
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </Link>
                             ))
                         )}
                     </div>

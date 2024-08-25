@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ChangeEvent, FocusEvent, FormEvent, useState } from "react";
 import { Link } from "react-router-dom";
 import Input from "./Input";
 import { AuthData as FormInfo } from "../ts/types/Auth";
@@ -33,7 +33,7 @@ const Signup: React.FC = () => {
         }
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         if (name === "confirmPassword") {
             setConfirmPassword(value);
@@ -42,7 +42,7 @@ const Signup: React.FC = () => {
         }
     };
 
-    const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const handleBlur = (e: FocusEvent<HTMLInputElement> | ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         const error = validateField(name, value);
         setErrors((prev) => ({ ...prev, [name]: error }));
@@ -55,7 +55,7 @@ const Signup: React.FC = () => {
         setIsFormValid(isValid);
     };
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (isFormValid) {
             console.log("Form is valid. Submitting...", formData);
@@ -107,8 +107,12 @@ const Signup: React.FC = () => {
                         type="password"
                         name="confirmPassword"
                         value={confirmPassword}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
+                        onChange={
+                            (e) => {
+                                handleChange(e);
+                                handleBlur(e);
+                            }
+                        }
                         placeholder="Confirm Password"
                         label="Confirm Password"
                         required

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ChangeEvent, FocusEvent, FormEvent, useState } from "react";
 import { Link } from "react-router-dom";
 import Input from "./Input";
 import { isEmail } from "../ts/utils/Validation";
@@ -26,12 +26,12 @@ const Login: React.FC = () => {
         }
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const handleBlur = (e: FocusEvent<HTMLInputElement> | ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         const error = validateField(name, value);
         setErrors((prev) => ({ ...prev, [name]: error }));
@@ -42,7 +42,7 @@ const Login: React.FC = () => {
         setIsFormValid(isValid);
     };
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         if (isFormValid) {
@@ -73,7 +73,10 @@ const Login: React.FC = () => {
                         type="password"
                         name="password"
                         value={formData.password}
-                        onChange={handleChange}
+                        onChange={(e) => {
+                            handleChange(e);
+                            handleBlur(e);
+                        }}
                         onBlur={handleBlur}
                         placeholder="Password"
                         label="Password"

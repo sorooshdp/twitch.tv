@@ -5,6 +5,7 @@ export interface Message {
 }
 
 export interface ChannelProps {
+    _id?:string;
     id?: string;
     username: string;
     isActive?: boolean;
