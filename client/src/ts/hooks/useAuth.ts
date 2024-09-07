@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthData } from "../types/Auth";
 
 export const api = axios.create({
-    baseURL: "https://localhost:5514/api",
+    baseURL: "https://twitch-tv-server.vercel.app/api",
     timeout: 5000,
     withCredentials: true,
 });

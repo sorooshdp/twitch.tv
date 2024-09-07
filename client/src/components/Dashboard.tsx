@@ -23,7 +23,7 @@ const Dashboard: React.FC<{ children?: ReactNode; liveChannels: object }> = ({ c
         const fetchChannels = async () => {
             try {
                 const response = await axios.get<{ followingChannels: Channel[] }>(
-                    "https://localhost:5514/api/channels/following",
+                    "https://twitch-tv-server.vercel.app/api/channels/following",
                     {
                         headers: {
                             Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("TOKEN")!)}`,

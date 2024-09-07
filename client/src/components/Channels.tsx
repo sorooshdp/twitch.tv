@@ -40,7 +40,7 @@ const Channels: React.FC = () => {
     useEffect(() => {
         const fetchChannels = async () => {
             try {
-                const response = await axios.get<ChannelProps[]>("https://localhost:5514/api/channels");
+                const response = await axios.get<ChannelProps[]>("https://twitch-tv-server.vercel.app/api/channels");
                 setChannels(response.data);
                 setLoading(false);
             } catch (err) {

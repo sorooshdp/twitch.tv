@@ -13,7 +13,7 @@ import User from '../models/User.js';
 export const registerSocketServer = (server: HttpServer): void => {
   const io = new Server(server, {
     cors: {
-      origin: 'https://localhost:5173',
+      origin: 'https://twitch-tv-seven.vercel.app/',
       methods: ['GET', 'POST'],
     },
   });

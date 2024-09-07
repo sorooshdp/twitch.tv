@@ -8,7 +8,7 @@ export const useChatSocket = (channelId: string) => {
 
     useEffect(() => {
         // Initialize the socket connection
-        const IO = io("https://localhost:5514", {
+        const IO = io("https://twitch-tv-server.vercel.app/", {
             withCredentials: true,
             transports: ["websocket"],
         });

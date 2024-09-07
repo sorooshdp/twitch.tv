@@ -4,7 +4,7 @@ import Channel from "../../models/Channel.js";
 import { ChannelData } from "../../types/models.js";
 import { CustomeReq } from "../../types/auth.js";
 
-const STREAM_URL_BASE = "http://localhost:8000/live/";
+const STREAM_URL_BASE = "https://twitch-tv-rtmp.liara.run/live/";
 
 /**
  * Handles errors by logging them and sending a response to the client.

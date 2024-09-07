@@ -114,7 +114,7 @@ export const SingleChannelPage: React.FC<{ sidebarOpen: boolean; liveChannels: o
                     console.error("Channel ID is undefined");
                     return;
                 }
-                const response = await axios.get<ChannelDetails>(`https://localhost:5514/api/channels/${id}`);
+                const response = await axios.get<ChannelDetails>(`https://twitch-tv-server.vercel.app/api/channels/${id}`);
                 setChannelDetails(response.data);
             } catch (error) {
                 console.error("Error fetching channel details:", error);
@@ -137,7 +137,7 @@ export const SingleChannelPage: React.FC<{ sidebarOpen: boolean; liveChannels: o
         try {
             if (isFollowing) {
                 await axios.post(
-                    `https://localhost:5514/api/channels/unfollow`,
+                    `https://twitch-tv-server.vercel.app/api/channels/unfollow`,
                     { channelId: id },
                     {
                         withCredentials: true,
@@ -145,7 +145,7 @@ export const SingleChannelPage: React.FC<{ sidebarOpen: boolean; liveChannels: o
                 );
             } else {
                 await axios.post(
-                    `https://localhost:5514/api/channels/follow`,
+                    `https://twitch-tv-server.vercel.app/api/channels/follow`,
                     { channelId: id },
                     {
                         withCredentials: true,

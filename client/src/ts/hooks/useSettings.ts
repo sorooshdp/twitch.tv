@@ -11,7 +11,7 @@ export const useSettings = () => {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await axios.get("https://localhost:5514/api/settings/channel", {
+            const response = await axios.get("https://twitch-tv-server.vercel.app/api/settings/channel", {
                 withCredentials: true,
                 headers: {
                     Authorization: `Bearer ${JSON.parse(sessionStorage.getItem("TOKEN")!)}`,
@@ -39,7 +39,7 @@ export const useSettings = () => {
         setError(null);
         try {
             const response = await axios.put(
-                "https://localhost:5514/api/settings/channel",
+                "https://twitch-tv-server.vercel.app/api/settings/channel",
                 updatedInfo,
                 {
                     withCredentials: true,
@@ -68,7 +68,7 @@ export const useSettings = () => {
         setError(null);
         try {
             const response = await axios.patch(
-                "https://localhost:5514/api/settings/password",
+                "https://twitch-tv-server.vercel.app/api/settings/password",
                 { password: currentPassword, newPassword },
                 {
                     withCredentials: true,
