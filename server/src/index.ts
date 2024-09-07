@@ -16,14 +16,19 @@ dotenv.config();
 const app = express();
 
 app.use(express.json());
-app.use(cors({
-  origin: process.env.CLIENT_URL || 'https://twitch-tv-seven.vercel.app/',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-}));
+app.use(
+    cors({
+        origin: "*",
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allowedHeaders: [
+            "Access-Control-Allow-Headers, content-type, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization",
+        ],
+        credentials: true,
 
-app.options('*', cors());
+    })
+);
+
+app.options("*", cors());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/channels", channelsRoutes);
