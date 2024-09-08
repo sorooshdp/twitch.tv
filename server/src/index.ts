@@ -10,6 +10,7 @@ import { registerSocketServer } from "./io/io.js";
 import User from "./models/User.js";
 import Channel from "./models/Channel.js";
 import Message from "./models/Message.js";
+import { customCors } from "./middlewares/cors.js";
 
 dotenv.config();
 
@@ -27,8 +28,8 @@ app.use(
 
     })
 );
-
-app.options("*", cors());
+app.use(customCors);
+// app.options("*", cors());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/channels", channelsRoutes);
