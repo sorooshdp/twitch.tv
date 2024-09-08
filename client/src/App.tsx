@@ -66,7 +66,7 @@ export const App = () => {
     useEffect(() => {
         const fetchLiveChannels = async (currentLiveChannels: object) => {
             try {
-                const streams = await axios.get("https://twitch-tv-server.vercel.app/api/streams");
+                const streams = await axios.get("https://twitch-tv-rtmp.liara.run/api/streams");
                 if (JSON.stringify(currentLiveChannels) !== JSON.stringify(streams.data.live)) {
                     setLiveChannels({...streams.data.live});
                     console.log(liveChannels);
