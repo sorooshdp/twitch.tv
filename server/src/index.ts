@@ -19,13 +19,10 @@ const app = express();
 app.use(express.json());
 app.use(
     cors({
-        origin: "*",
+        origin: "https://twitch-tv-seven.vercel.app",
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        allowedHeaders: [
-            "Access-Control-Allow-Headers, content-type, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization",
-        ],
+        allowedHeaders: ["Content-Type", "Authorization"],
         credentials: true,
-
     })
 );
 app.use(customCors);

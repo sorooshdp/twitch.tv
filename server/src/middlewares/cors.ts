@@ -6,21 +6,21 @@ export function customCors(
     res: express.Response,
     next: NextFunction
 ) {
-    res.setHeader("Access-Control-Allow-Origin", "*");
+    const allowedOrigin = 'https://twitch-tv-seven.vercel.app';
+    
+    res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
     res.setHeader(
         "Access-Control-Allow-Headers",
-        "Access-Control-Allow-Headers, content-type, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization"
+        "Origin, X-Requested-With, Content-Type, Accept, Authorization"
     );
-    res.setHeader("Access-Control-Allow-Credentials", "ture");
+    res.setHeader("Access-Control-Allow-Credentials", "true"); 
     res.setHeader(
         "Access-Control-Allow-Methods",
-        "GET, POST, PUT, PATCH, OPTIONS, DELETE"
+        "GET, POST, PUT, PATCH, DELETE, OPTIONS"
     );
 
     if (req.method === "OPTIONS") {
-        return res.status(200).json({
-            body: "OK",
-        });
+        return res.status(204).end();
     }
     next();
 }

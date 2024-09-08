@@ -7,6 +7,10 @@ export const api = axios.create({
     baseURL: "https://twitch-tv-server.vercel.app/api",
     timeout: 5000,
     withCredentials: true,
+    headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+    }
 });
 
 export const useAuth = () => {
@@ -19,7 +23,11 @@ export const useAuth = () => {
         setError(null);
 
         try {
-            const response: AxiosResponse = await api.post(endpoint, data);
+            const response: AxiosResponse = await api.post(endpoint, data, {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
             const { token, username } = response.data.userDetails;
 
             sessionStorage.setItem("TOKEN", JSON.stringify(token));

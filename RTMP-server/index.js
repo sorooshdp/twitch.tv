@@ -10,7 +10,7 @@ const config = {
     },
     http: {
         port: 8000,
-        allow_origin: "https://twitch-tv-seven.vercel.app/"
+        allow_origin: "*"
     },
     https: {
         port: 8443,
