@@ -19,14 +19,14 @@ const app = express();
 app.use(express.json());
 app.use(
     cors({
-        origin: "https://twitch-tv-seven.vercel.app",
+        origin: "*",
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],
         credentials: true,
     })
 );
 app.use(customCors);
-// app.options("*", cors());
+app.options("*", cors());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/channels", channelsRoutes);

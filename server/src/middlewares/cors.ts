@@ -6,9 +6,7 @@ export function customCors(
     res: express.Response,
     next: NextFunction
 ) {
-    const allowedOrigin = 'https://twitch-tv-seven.vercel.app';
-    
-    res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
+    res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader(
         "Access-Control-Allow-Headers",
         "Origin, X-Requested-With, Content-Type, Accept, Authorization"
