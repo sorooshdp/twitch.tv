@@ -11,8 +11,14 @@
     ],
     "routes": [
         {
+            "src": "/io/?.*",
+            "dest": "src/index.ts"
+        },
+        {
             "src": "/(.*)",
             "dest": "src/index.ts"
         }
-    ]
+    ],
+
+    "rewrites": [{ "source": "/(.*)", "destination": "/" }]
 }

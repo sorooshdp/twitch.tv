@@ -9,12 +9,23 @@ export const useChatSocket = (channelId: string) => {
     useEffect(() => {
         // Initialize the socket connection
         const IO = io("https://twitch-tv-server.vercel.app/", {
-            withCredentials: true,
             transports: ["websocket"],
         });
 
         // Set the socket instance in state
         setSocket(IO);
+
+        IO.on("connect", () => {
+            console.log("WebSocket connection established");
+        });
+
+        IO.on("connect_error", (error) => {
+            console.error("WebSocket connection error:", error);
+        });
+
+        IO.on("disconnect", (reason) => {
+            console.log("WebSocket connection disconnected:", reason);
+        });
 
         // Join the channel
         IO.emit("join-channel", channelId);
