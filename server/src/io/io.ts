@@ -13,9 +13,12 @@ import User from '../models/User.js';
 export const registerSocketServer = (server: HttpServer): void => {
   const io = new Server(server, {
     cors: {
-      origin: 'https://twitch-tv-seven.vercel.app/',
-      methods: ['GET', 'POST'],
+      origin: ["https://twitch-tv-seven.vercel.app", "http://localhost:3000"],
+      methods: ["GET", "POST"],
+      credentials: true,
     },
+    allowEIO3: true,
+    path: "/socket.io/",
   });
 
   io.on('connection', (socket: Socket) => {
@@ -24,7 +27,6 @@ export const registerSocketServer = (server: HttpServer): void => {
     socket.on('join-channel', async (channelId: string) => {
       socket.join(channelId);
       console.log(`Client ${socket.id} joined channel ${channelId}`);
-
       try {
         const channel = await Channel.findById(channelId).populate('messages').exec();
         if (channel) {
@@ -44,7 +46,6 @@ export const registerSocketServer = (server: HttpServer): void => {
     socket.on('chat-message', async (data: { channelId: string, message: { author: string, content: string, date: string } }) => {
       console.log("Message received on server:", data.message.content);
       try {
-        // Store the message in the database
         const newMessage = new Message({
           channelId: data.channelId,
           author: data.message.author,
@@ -52,15 +53,11 @@ export const registerSocketServer = (server: HttpServer): void => {
           date: new Date(data.message.date)
         });
         await newMessage.save();
-
-        // Add the message to the channel's messages array
         await Channel.findByIdAndUpdate(
           data.channelId,
           { $push: { messages: newMessage._id } },
           { new: true }
         );
-
-        // Broadcast the message to all clients in the channel
         io.to(data.channelId).emit('new-message', newMessage);
       } catch (error) {
         console.error('Error saving message to database:', error);

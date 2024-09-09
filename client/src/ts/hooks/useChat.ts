@@ -1,64 +1,78 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { io, Socket } from "socket.io-client";
 import { Message } from "../types/Channel";
 
 export const useChatSocket = (channelId: string) => {
-    const [messages, setMessages] = useState<Message[]>([]);
-    const [socket, setSocket] = useState<Socket | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const [connectionError, setConnectionError] = useState<string | null>(null);
 
-    useEffect(() => {
-        // Initialize the socket connection
-        const IO = io("https://twitch-tv-server.vercel.app/", {
-            transports: ["websocket"],
-        });
+  const initializeSocket = useCallback(() => {
+    const IO = io("https://twitch-tv-server.vercel.app/", {
+      withCredentials: true,
+      transports: ["websocket"],
+      timeout: 10000, 
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+    });
 
-        // Set the socket instance in state
-        setSocket(IO);
+    IO.on("connect", () => {
+      console.log("WebSocket connected successfully");
+      setConnectionError(null);
+    });
 
-        IO.on("connect", () => {
-            console.log("WebSocket connection established");
-        });
+    IO.on("connect_error", (error) => {
+      console.error("Connection error:", error);
+      setConnectionError(`Connection error: ${error.message}`);
+    });
 
-        IO.on("connect_error", (error) => {
-            console.error("WebSocket connection error:", error);
-        });
+    IO.on("error", (error) => {
+      console.error("Socket error:", error);
+      setConnectionError(`Socket error: ${error.message}`);
+    });
 
-        IO.on("disconnect", (reason) => {
-            console.log("WebSocket connection disconnected:", reason);
-        });
+    IO.on("disconnect", (reason) => {
+      console.log("Disconnected:", reason);
+      if (reason === "io server disconnect") {
+        IO.connect();
+      }
+    });
 
-        // Join the channel
-        IO.emit("join-channel", channelId);
+    setSocket(IO);
 
-        // Handle incoming chat history
-        IO.on("chat-history", (data: { channelId: string; messages: Message[] }) => {
-            setMessages(data.messages);
-        });
+    return IO;
+  }, []);
 
-        // Handle incoming new messages
-        IO.on("new-message", (message: Message) => {
-            console.log("message recieved on client: " + message);
-            setMessages((prevMessages) => [...prevMessages, message]);
-        });
+  useEffect(() => {
+    const IO = initializeSocket();
 
-        // Cleanup on component unmount or channel change
-        return () => {
-            IO.emit("leave-channel", channelId);
-            IO.disconnect();
-        };
-    }, [channelId]);
+    IO.emit("join-channel", channelId);
 
-    // Function to send a new message
-    const sendMessage = (content: string, author: string) => {
-        if (socket) {
-            const message: Message = {
-                author,
-                content,
-                date: new Date().toISOString(),
-            };
-            socket.emit("chat-message", { channelId, message });
-        }
+    IO.on("chat-history", (data: { channelId: string; messages: Message[] }) => {
+      setMessages(data.messages);
+    });
+
+    IO.on("new-message", (message: Message) => {
+      console.log("Message received on client:", message);
+      setMessages((prevMessages) => [...prevMessages, message]);
+    });
+
+    return () => {
+      IO.emit("leave-channel", channelId);
+      IO.disconnect();
     };
+  }, [channelId, initializeSocket]);
 
-    return { messages, sendMessage };
+  const sendMessage = useCallback((content: string, author: string) => {
+    if (socket) {
+      const message: Message = {
+        author,
+        content,
+        date: new Date().toISOString(),
+      };
+      socket.emit("chat-message", { channelId, message });
+    }
+  }, [socket, channelId]);
+
+  return { messages, sendMessage, connectionError };
 };
