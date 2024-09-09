@@ -21,11 +21,13 @@ app.use(
     cors({
         origin: "*",
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        allowedHeaders: ["Content-Type", "Authorization"],
+        allowedHeaders: [
+            "Access-Control-Allow-Headers, content-type, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization",
+        ],
         credentials: true,
     })
 );
-app.use(customCors);
+// app.use(customCors);
 app.options("*", cors());
 
 app.use("/api/auth", authRoutes);
