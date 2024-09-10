@@ -114,7 +114,9 @@ export const SingleChannelPage: React.FC<{ sidebarOpen: boolean; liveChannels: o
                     console.error("Channel ID is undefined");
                     return;
                 }
-                const response = await axios.get<ChannelDetails>(`https://twitch-tv-0cde.onrender.com/api/channels/${id}`);
+                const response = await axios.get<ChannelDetails>(
+                    `https://twitch-tv-0cde.onrender.com/api/channels/${id}`
+                );
                 setChannelDetails(response.data);
             } catch (error) {
                 console.error("Error fetching channel details:", error);
@@ -163,12 +165,12 @@ export const SingleChannelPage: React.FC<{ sidebarOpen: boolean; liveChannels: o
     }
 
     console.log(Object.keys(liveChannels ?? {}));
-    console.log(channelDetails)
+    console.log(channelDetails);
 
     return (
-        <div className="flex h-full bg-dark text-white">
-            <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarOpen ? "mr-4" : ""}`}>
-                <div className={`flex-1 ${sidebarOpen ? "w-[calc(100%-320px)]" : "w-full"}`}>
+        <div className="flex flex-col lg:flex-row h-full bg-dark text-white">
+            <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarOpen ? "lg:mr-4" : ""}`}>
+                <div className={`flex-1 ${sidebarOpen ? "lg:w-[calc(100%-320px)]" : "w-full"}`}>
                     <VideoPlayer
                         streamUrl={channelDetails.streamUrl!}
                         isOnline={Object.keys(liveChannels ?? {}).includes(channelDetails.streamKey!)}
@@ -181,7 +183,11 @@ export const SingleChannelPage: React.FC<{ sidebarOpen: boolean; liveChannels: o
                     />
                 </div>
             </div>
-            {id && currentUser && <ChatPanel channelId={id} currentUser={currentUser} />}
+            {id && currentUser && (
+                <div className="w-full lg:w-auto">
+                    <ChatPanel channelId={id} currentUser={currentUser} />
+                </div>
+            )}
         </div>
     );
 };

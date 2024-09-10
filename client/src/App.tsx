@@ -11,6 +11,19 @@ const Channels = lazy(() => import("./components/Channels"));
 const Channel = lazy(() => import("./components/Channel"));
 const Settings = lazy(() => import("./components/Settings"));
 
+const CuteSpinner = () => {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="relative w-16 h-16">
+          <div className="absolute top-0 left-0 right-0 bottom-0 border-4 border-purple-200 rounded-full"></div>
+          <div className="absolute top-0 left-0 right-0 bottom-0 border-4 border-purple-500 rounded-full animate-spin" style={{ borderTopColor: 'transparent' }}></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-purple-500 rounded-full animate-pulse"></div>
+          <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-white rounded-full"></div>
+        </div>
+      </div>
+    );
+  };
+
 const useAuth = () => {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
@@ -36,7 +49,7 @@ const PrivateRoute: React.FC<{ children: ReactNode }> = ({ children }) => {
     const location = useLocation();
 
     if (isAuthenticated === null) {
-        return <div>Loading...</div>;
+        return <CuteSpinner />;
     }
 
     if (isAuthenticated === false) {
@@ -50,7 +63,7 @@ const PublicRoute: React.FC<{ children: ReactNode }> = ({ children }) => {
     const isAuthenticated = useAuth();
 
     if (isAuthenticated === null) {
-        return <div>Loading...</div>;
+        return <CuteSpinner />;
     }
 
     if (isAuthenticated === true) {
@@ -83,7 +96,7 @@ export const App = () => {
 
     return (
         <Router>
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<CuteSpinner />}>
                 <Routes>
                     <Route path="/" element={<Main />} />
                     <Route
