@@ -2,11 +2,11 @@ import React from "react";
 import { ChannelProps as FormData } from "../ts/types/Channel";
 
 interface ChannelInfoFormProps {
-    formData: FormData;
-    handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-    handleSubmit: (e: React.FormEvent) => Promise<void>;
-    isUpdating: boolean;
-    updateError: string | null;
+  formData: FormData;
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void; 
+  handleSubmit: (e: React.FormEvent) => Promise<void>;
+  isUpdating: boolean;
+  updateError: string | null;
 }
 
 export const ChannelInfoForm: React.FC<ChannelInfoFormProps> = React.memo(
@@ -28,7 +28,7 @@ export const ChannelInfoForm: React.FC<ChannelInfoFormProps> = React.memo(
                 id={field}
                 name={field}
                 value={formData[field]}
-                onChange={handleInputChange}
+                onChange={handleInputChange}  
                 rows={3}
               />
             ) : (
@@ -38,7 +38,7 @@ export const ChannelInfoForm: React.FC<ChannelInfoFormProps> = React.memo(
                 name={field}
                 type="text"
                 value={formData[field]}
-                onChange={handleInputChange}
+                onChange={handleInputChange}  
               />
             )}
           </div>
@@ -57,3 +57,4 @@ export const ChannelInfoForm: React.FC<ChannelInfoFormProps> = React.memo(
     </form>
   )
 );
+
