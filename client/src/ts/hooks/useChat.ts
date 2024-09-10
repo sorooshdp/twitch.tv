@@ -8,7 +8,7 @@ export const useChatSocket = (channelId: string) => {
   const [connectionError, setConnectionError] = useState<string | null>(null);
 
   const initializeSocket = useCallback(() => {
-    const IO = io("https://twitch-tv-server.vercel.app/", {
+    const IO = io("https://twitch-tv-0cde.onrender.com/", {
       withCredentials: true,
       transports: ["websocket"],
       timeout: 10000, 

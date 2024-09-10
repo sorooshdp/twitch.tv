@@ -4,13 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { AuthData } from "../types/Auth";
 
 export const api = axios.create({
-    baseURL: "https://twitch-tv-server.vercel.app/api",
+    baseURL: "https://twitch-tv-0cde.onrender.com/api",
     timeout: 5000,
     withCredentials: true,
     headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-    }
+        "Content-Type": "application/json",
+        Accept: "application/json",
+    },
 });
 
 export const useAuth = () => {
@@ -25,8 +25,8 @@ export const useAuth = () => {
         try {
             const response: AxiosResponse = await api.post(endpoint, data, {
                 headers: {
-                    'Content-Type': 'application/json',
-                }
+                    "Content-Type": "application/json",
+                },
             });
             const { token, username } = response.data.userDetails;
 
